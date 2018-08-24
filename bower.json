@@ -1,0 +1,32 @@
+{
+  "name": "leaflet-polyline",
+  "version": "1.0.0",
+  "homepage": "https://github.com/FCOO/leaflet-polyline",
+  "authors": [
+    "Niels Holt"
+  ],
+  "description": "",
+  "main": [
+    "dist/leaflet-polyline.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FCOO/leaflet-polyline.git"
+  },
+  "dependencies": {
+    "jquery": "latest",
+    "leaflet": "latest"
+  },
+  "devDependencies": {},
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "moduleType": [
+    "es6"
+  ]
+}
