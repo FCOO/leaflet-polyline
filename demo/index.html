@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="da" style="font-size: 100%">
+<head>
+	<title>fcoo.dk - leaflet-polyline - Demo</title>
+	<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv='x-dns-prefetch-control' content='on'>
+
+	<meta name='copyright' content='FCOO'>
+	<meta name='owner' content='FCOO'>
+
+    <link  href="bower_components.css" rel="stylesheet">
+    <link  href="../src/leaflet-polyline.css" rel="stylesheet">
+    <style>
+        html, body, #map {
+            padding: 0; margin: 0; width:100%; height:100%;
+        }
+    </style>
+
+</head>
+
+<body>
+	<div id="map" style="cursor: pointer; _width: 800px; _height: 600px"></div>
+
+	<script src="bower_components.js"></script>
+	<script src="../src/leaflet-polyline.js"></script>
+	<script>
+    window.bsIsTouch = false;
+    window.bsIsTouch = (window.location.search =='?touch');
+
+    var map = L.map('map', {}).setView([56.2, 11.5], 8);
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
+    }).addTo(map);
+
+    var polyLine = L.polyline([[56.5, 10.5], [57,12], [55,12]], {
+
+            lineColorName: 'teal',
+            border: true,
+            _shadow: true,
+            hover: true,
+            transparent: true,
+            shadowWhenPopupOpen: true,
+            addInteractive: true,
+            interactive: true,
+        }).addTo(map);
+
+    polyLine.bindTooltip('Tooltip');
+    polyLine.bindPopup('Popup')
+polyLine.bringToFront();
+
+    var polygon = L.polygon([[56.5, 1+10.5], [57,2+12], [55,2+12]], {
+
+            colorName: 'green',
+            borderColorName: 'black',
+            border: true,
+            _shadow: true,
+
+            fill: true,
+            hover: true,
+            transparent: true,
+            shadowWhenPopupOpen: true,
+
+            addInteractive: true,
+            interactive: true,
+        }).addTo(map);
+
+
+    polygon.bindTooltip('Tooltip2')
+    polygon.bindPopup('Popup2')
+
+
+    //map.on('click', function(){ polyLine.setInteractive(); polygon.setInteractive(); });
+
+
+    var data = {
+      "type": "FeatureCollection",
+      "features": [
+      {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9, 52]
+      },
+      "properties": {
+        "prop0": "value0"
+      }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
+        ]
+      },
+      "properties": {
+        "prop0": "value0",
+        "prop1": 0.0
+      }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[10, 54], [10, 55], [12, 55],[12, 54]]
+        ]
+      },
+      "properties": {
+        "prop0": "value0",
+        "prop1": { "this": "that" }
+      }
+    }
+
+  ]
+}
+
+    L.geoJSON(data,{
+        onEachFeature: function (feature, layer) {
+            layer.bindTooltip('Tooltip geoJSON');
+            layer.bindPopup('popup geoJSON');
+            layer.on('mouseover', function () {
+                console.log('mouseOVER');
+            });
+            layer.on('mouseout', function () {
+                console.log('mouseOUT');
+            });
+        },
+
+        polyline: {
+            borderColorName: "orange", width: 4,
+            addInteractive: true,
+            interactive: true,
+            hover: true,
+            border: true,
+            shadow:false, shadowWidth: 4,
+            transparent: true,
+        },
+        polygon: {
+            colorName: 'red',
+            borderColorName: "green", width: 4,
+            addInteractive: true,
+            interactive: true,
+            hover: true,
+            border: true,
+            _shadow:true, shadowWidth: 40,
+            transparent: true,
+        }
+    }).addTo(map);
+
+
+	</script>
+</body>
+</html>

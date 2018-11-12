@@ -1,0 +1,85 @@
+/***********************************************
+    leaflet-polyline.scss
+
+	(c) 2018, FCOO
+
+	https://github.com/FCOO/leaflet-polyline
+	https://github.com/FCOO
+
+************************************************/
+//BOURBON - http://bourbon.io/ version 5
+@import "../bower_components/bourbon/core/bourbon";
+
+//MODERNIZR-MIXIN - https://github.com/danielguillan/modernizr-mixin
+@import "../bower_components/modernizr-mixin/stylesheets/modernizr";
+
+//MATHSASS - https://github.com/terkel/mathsass
+@import "../bower_components/mathsass/dist/math";
+
+
+@import "leaflet-polyline-mixin";
+
+//lpl-base = The original polyline
+.lpl-base {
+    stroke-opacity: 1;
+    fill-opacity  : 1;
+    &.lpl-transparent {
+        stroke-opacity: .7;
+        fill-opacity  : .35;
+        &.lpl-hover{
+            stroke-opacity: .9;
+            fill-opacity  : .7;
+        }
+    }
+    fill: none;
+}
+
+
+//lpl-border = The white line around the line to make contrast to the map behind
+.lpl-border {
+    stroke        : white;
+    stroke-opacity: .5;
+}
+
+
+//lpl-shadow = The shadow
+.lpl-shadow {
+    stroke        : white;
+    stroke-opacity: 0;
+
+    &.lpl-show, &.lpl-hover {
+        stroke-opacity: .28; //.28 = estimate to look like google maps
+    }
+}
+
+
+//lpl-interactive  = The layer on to to catch events
+.lpl-interactive {
+    &.leaflet-interactive {
+        stroke: transparent;
+        fill  : none;
+        &.lpl-fill {
+            fill  : transparent;
+        }
+    }
+}
+
+
+//Create standard colors
+@each $name, $color in (
+    "pink"      : pink,
+    "purple"    : purple,
+    "red"       : red,
+    "orange"    : orange,
+    "yellow"    : yellow,
+    "green"     : green,
+    "cyan"      : cyan,
+    "blue"      : blue,
+    "brown"     : brown,
+    "white"     : white,
+    "grey"      : grey,
+    "black"     : black
+){
+    @include polyline-classes( $name, $color, $color );
+}
+

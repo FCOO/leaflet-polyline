@@ -2,7 +2,7 @@
 
 
 ## Description
-Extend `L.Polyline` with options to draw "shadow" and "interactive"-zone
+Extend `L.Polyline` and `L.Polygon` with options to draw "shadow" and "interactive"-zone
 
 ## Installation
 ### bower
@@ -16,21 +16,31 @@ If `options.addInteractive: true` a "shadow"-line is added around the polyline a
 
 Default options for the shadow and interactive lines are
 
-	{
-    	shadowStyle: {
-        	width: 1,
-            color: 'white',
-            opacity: 0.5
-        },
-		interactiveStyle: {
-        	width  : 4,
-            color  : 'transparent',
-            opacity: 1
-        },
+            weight         : 2,  //The width of the line
+            colorName      : '', //Class-name to give the fill color
+            fillColorName  : '', //Same as colorName
+            borderColorName: '',  //Class-name to give the border color
+            LineColorName  : '',  //Same as borderColorName
+            border     : false,  //True to add a semi-transparent white border to the line
+            transparent: false,  //True to make the line semi-transparent
+            hover      : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
+            shadow     : false,  //true to add big shadow to the line
+            shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
+            tooltipHideWhenPopupOpen: true, //false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
 
+            borderWidth     : 1, //Width of border
+            shadowWidth     : 3, //Width of shadow
+            interactiveWidth: 5, //Width of interactive area
+
+The new options can also be set in 
+`options.polygon` or `options.Polygon` for `L.Polygon`, 
+and in
+`options.polyline`, `options.Polyline`, `options.lineString`, or `optionsLineString` for `L.Polyline`
+ 
+Used eq. in `L.GeoJSON` to set different options for lines and polygons
 	 
 ### Methods
-New methods are added to `L.Polyline`
+New methods are added to `L.Polyline` and `L.Polygon`
 
         .setInteractive( on ); 	//Set the polyline interactive on or off
         .setInteractiveOn();	//Set the polyline interactive on

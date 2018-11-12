@@ -1,6 +1,6 @@
 {
   "name": "leaflet-polyline",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "homepage": "https://github.com/FCOO/leaflet-polyline",
   "authors": [
     "Niels Holt"
@@ -15,9 +15,23 @@
   },
   "dependencies": {
     "jquery": "latest",
-    "leaflet": "latest"
+    "leaflet": "latest",
+    "leaflet-latlng-geodesy": "fcoo/leaflet-latlng-geodesy#^1.0.1",
+    "Leaflet.GeometryUtil": "makinacorpus/Leaflet.GeometryUtil#^0.8.1"
   },
-  "devDependencies": {},
+  "overrides": {
+    "Leaflet.GeometryUtil": {
+      "main": "src/leaflet.geometryutil.js",
+      "dependencies": {
+        "leaflet": "latest"
+      }
+    }
+  },
+  "devDependencies": {
+    "bourbon": "latest",
+    "modernizr-mixin": "latest",
+    "mathsass": "latest"
+  },
   "license": "MIT",
   "ignore": [
     "**/.*",

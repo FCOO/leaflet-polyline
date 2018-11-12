@@ -1,0 +1,29 @@
+/***********************************************
+    _leaflet-polyline-mixin.scss
+
+	(c) 2018, FCOO
+
+	https://github.com/FCOO/leaflet-polyline
+	https://github.com/FCOO
+
+************************************************/
+@mixin polyline-name-color( $name, $color: blue ){
+    .lpl-base.lpl-#{$name}{
+        fill: $color;
+    }
+}
+
+@mixin polyline-name-border-color( $name, $border-color: white ){
+    .lpl-base.lpl-border-#{$name},
+    .lpl-shadow.lpl-border-#{$name} {
+        stroke: $border-color;
+    }
+}
+
+
+@mixin polyline-classes( $name, $color: blue, $border-color: white ){
+    @include polyline-name-color( $name, $color);
+    @include polyline-name-border-color( $name, $border-color);
+}
+
+
