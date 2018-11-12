@@ -246,8 +246,8 @@
         _popupopen and _popupclose: Highlight polyline
         *****************************************************/
         _popupopen: function(){
-            if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent && this.hideTooltip)
-                this.hideTooltip();
+            if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent && this.interactiveLayerGroup && this.interactiveLayerGroup.hideTooltip)
+                this.interactiveLayerGroup.hideTooltip();
             if (this.options.shadowWhenPopupOpen && !this.options.shadow)
                 this._addClass(this.shadowPolyline, 'lpl-show');
              if (this.options.transparent)
@@ -255,8 +255,8 @@
         },
 
         _popupclose: function(){
-            if (this.options.tooltipHideWhenPopupOpen && this.showTooltip)
-                this.showTooltip();
+            if (this.options.tooltipHideWhenPopupOpen && this.interactiveLayerGroup && this.interactiveLayerGroup.hideTooltip)
+                this.interactiveLayerGroup.showTooltip();
             if (this.options.shadowWhenPopupOpen && !this.options.shadow)
                 this._removeClass(this.shadowPolyline, 'lpl-show');
              if (this.options.transparent)

@@ -1,6 +1,6 @@
 {
   "name": "leaflet-polyline",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "homepage": "https://github.com/FCOO/leaflet-polyline",
   "author": "Niels Holt nho@fcoo.dk",
   "description": "package.json is only use for building the package. see bower.json for more info",
