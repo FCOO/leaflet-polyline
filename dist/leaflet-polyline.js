@@ -71,7 +71,7 @@
                 //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
                 $.each(isPolygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
                     if (options[name])
-                        options = $.extend({}, options, options[name]);
+                        options = $.extend({}, options[name]);
                 });
 
                 if (options.addInteractive)

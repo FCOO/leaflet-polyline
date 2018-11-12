@@ -38,6 +38,8 @@ and in
 `options.polyline`, `options.Polyline`, `options.lineString`, or `optionsLineString` for `L.Polyline`
  
 Used eq. in `L.GeoJSON` to set different options for lines and polygons
+
+**NOTE** All options *must* be set in eq. `options.polyline`
 	 
 ### Methods
 New methods are added to `L.Polyline` and `L.Polygon`
