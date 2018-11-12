@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         "fcoo_grunt_plugin":{
             default: {
                 "haveJavaScript": true,  //true if the packages have js-files
-                "haveStyleSheet": false, //true if the packages have css and/or scss-files
+                "haveStyleSheet": true,  //true if the packages have css and/or scss-files
                 "haveGhPages"   : true,  //true if there is a branch "gh-pages" used for demos
 
                 "beforeProdCmd": "",     //Cmd to be run at the start of prod-task. Multi cmd can be seperated by "&"

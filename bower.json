@@ -1,13 +1,14 @@
 {
   "name": "leaflet-polyline",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "homepage": "https://github.com/FCOO/leaflet-polyline",
   "authors": [
     "Niels Holt"
   ],
   "description": "",
   "main": [
-    "dist/leaflet-polyline.js"
+    "dist/leaflet-polyline.js",
+    "dist/leaflet-polyline.css"
   ],
   "repository": {
     "type": "git",
