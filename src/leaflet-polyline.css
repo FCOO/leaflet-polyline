@@ -20,20 +20,33 @@
   stroke-opacity: 1;
   fill-opacity: 1;
   fill: none; }
-  .lpl-base.lpl-transparent {
+  .lpl-base.lpl-popup-open {
+    stroke-opacity: 1;
+    fill-opacity: 1; }
+    .lpl-base.lpl-popup-open.lpl-transparent {
+      stroke-opacity: .9;
+      fill-opacity: .8; }
+  .lpl-base:not(.lpl-popup-open).lpl-only-show-on-hover {
+    stroke-opacity: 0;
+    fill-opacity: 0; }
+  .lpl-base:not(.lpl-popup-open).lpl-transparent:not(.lpl-only-show-on-hover) {
     stroke-opacity: .7;
     fill-opacity: .35; }
-    .lpl-base.lpl-transparent.lpl-hover {
+    .lpl-base:not(.lpl-popup-open).lpl-transparent:not(.lpl-only-show-on-hover).lpl-hover {
       stroke-opacity: .9;
       fill-opacity: .7; }
 
 .lpl-border {
   stroke: white;
-  stroke-opacity: .5; }
+  stroke-opacity: 0;
+  fill: none; }
+  .lpl-border.lpl-show:not(.lpl-only-show-on-hover), .lpl-border.lpl-show.lpl-popup-open {
+    stroke-opacity: .5; }
 
 .lpl-shadow {
   stroke: white;
-  stroke-opacity: 0; }
+  stroke-opacity: 0;
+  fill: none; }
   .lpl-shadow.lpl-show, .lpl-shadow.lpl-hover {
     stroke-opacity: .28; }
 
@@ -126,3 +139,10 @@
 .lpl-base.lpl-border-black,
 .lpl-shadow.lpl-border-black {
   stroke: black; }
+
+.lpl-base.lpl-none {
+  fill: none; }
+
+.lpl-base.lpl-border-none,
+.lpl-shadow.lpl-border-none {
+  stroke: none; }

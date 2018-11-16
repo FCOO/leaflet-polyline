@@ -23,22 +23,44 @@
 .lpl-base {
     stroke-opacity: 1;
     fill-opacity  : 1;
-    &.lpl-transparent {
-        stroke-opacity: .7;
-        fill-opacity  : .35;
-        &.lpl-hover{
+    fill          : none;
+
+    &.lpl-popup-open {
+        stroke-opacity: 1;
+        fill-opacity  : 1;
+        &.lpl-transparent{
             stroke-opacity: .9;
-            fill-opacity  : .7;
+            fill-opacity  : .8;
         }
     }
-    fill: none;
+
+    &:not(.lpl-popup-open){
+        &.lpl-only-show-on-hover {
+            stroke-opacity: 0;
+            fill-opacity  : 0;
+        }
+
+        &.lpl-transparent:not(.lpl-only-show-on-hover) {
+            stroke-opacity: .7;
+            fill-opacity  : .35;
+            &.lpl-hover{
+                stroke-opacity: .9;
+                fill-opacity  : .7;
+            }
+        }
+    }
 }
 
 
 //lpl-border = The white line around the line to make contrast to the map behind
 .lpl-border {
     stroke        : white;
-    stroke-opacity: .5;
+    stroke-opacity: 0;
+    fill          : none;
+    &.lpl-show:not(.lpl-only-show-on-hover),
+    &.lpl-show.lpl-popup-open{
+        stroke-opacity: .5;
+    }
 }
 
 
@@ -46,14 +68,14 @@
 .lpl-shadow {
     stroke        : white;
     stroke-opacity: 0;
-
+    fill          : none;
     &.lpl-show, &.lpl-hover {
         stroke-opacity: .28; //.28 = estimate to look like google maps
     }
 }
 
 
-//lpl-interactive  = The layer on to to catch events
+//lpl-interactive  = The layer on top to catch events
 .lpl-interactive {
     &.leaflet-interactive {
         stroke: transparent;
@@ -78,7 +100,8 @@
     "brown"     : brown,
     "white"     : white,
     "grey"      : grey,
-    "black"     : black
+    "black"     : black,
+    "none"      : none
 ){
     @include polyline-classes( $name, $color, $color );
 }

@@ -14,17 +14,21 @@
     var beforeAndAfter = function(methodName, method, reverseOrder) {
             method = method || L.Polyline.prototype[methodName];
             return function(){
-                var firstLayerGroup = reverseOrder ? this.interactiveLayerGroup : this.borderAndShadowLayerGroup,
-                    lastLayerGroup  = reverseOrder ? this.borderAndShadowLayerGroup : this.interactiveLayerGroup;
-
-                if (firstLayerGroup)
-                    firstLayerGroup[methodName].apply(firstLayerGroup, arguments);
-
-                var result = method.apply(this, arguments);
-
-                if (lastLayerGroup)
-                    lastLayerGroup[methodName].apply(lastLayerGroup, arguments);
-                return result;
+                if (this.polylineList){
+                    var length = this.polylineList.length-1,
+                        firstIndex = reverseOrder ? length : 0,
+                        lastIndex  = reverseOrder ? 0 : length,
+                        result, i;
+                     for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ ){
+                        if (i == thisIndex)
+                            result = method.apply(this, arguments);
+                        else
+                            this.polylineList[i][methodName].apply(this.polylineList[i], arguments);
+                    }
+                    return result;
+                }
+                else
+                    return method.apply(this, arguments);
             };
         };
 
@@ -33,17 +37,19 @@
           //color          : '', //The color
             colorName      : '', //Class-name to give the fill color
             fillColorName  : '', //Same as colorName
-            borderColorName: '',  //Class-name to give the border color
+            borderColorName: '',  //Class-name to give the border color. "none" will hide the border
             LineColorName  : '',  //Same as borderColorName
 
 
             //fill       : false,  //True to add fill colored by fillColor or SOMETHING ELSE TODO
-            border     : false,  //True to add a semi-transparent white border to the line
-            transparent: false,  //True to make the line semi-transparent
-            hover      : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
-            shadow     : false,  //true to add big shadow to the line
+            border         : false,  //True to add a semi-transparent white border to the line
+            transparent    : false,  //True to make the line semi-transparent
+            hover          : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
+            onlyShowOnHover: false, //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
+            shadow         : false,  //true to add big shadow to the line
             shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
-            tooltipHideWhenPopupOpen: true, //false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+            tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+
 
             //TODO zIndexWhenHover         : null,   //zIndex applied when the polyline/polygon is hover
             //TODO zIndexWhenPopupOpen     : null,   //zIndex applied when the a popup is open on the polyline/polygon
@@ -54,118 +60,134 @@
             shadowWidth     : 3, //Width of shadow
             interactiveWidth: 5, //Width of interactive area
 
-        };
+        },
+
+        shadowIndex      = 0,
+        borderIndex      = 1,
+        thisIndex        = 2,
+        interactiveIndex = 3;
+
+        function getOptions( className, interactive ){
+            return $.extend({}, defaultOptions, {
+                weight: 10, color: 'red',
+                       className     : className,
+                       addInteractive: false,
+                       interactive   : interactive,
+                   });
+        }
+
 
     L.Polyline.include({
+        /*****************************************************
+        _getPolyOptions
+        Returna copy of the current options to be used
+        Depends on the class og this
+        *****************************************************/
+        _getPolyOptions: function(){
+            var result = $.extend({}, this.options);
+
+            //If there are options in options.polyline or options.LineString for polyline etc. => copy them into options.
+            //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
+            $.each(this instanceof L.Polygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
+               if (result[name])
+                   $.extend(result, result[name]);
+            });
+            return $.extend({}, defaultOptions, result);
+        },
+
         /*****************************************************
         initialize
         *****************************************************/
         initialize: function( initialize ){
             return function( latLngs, options ){
-
                 options = options || {};
+                if (!options.addInteractive)
+                    return initialize.call(this, latLngs, options );
 
-                var isPolygon = this instanceof L.Polygon;
-
-                //If there are options in options.polyline or options.LineString for polyline etc. => copy them into options.
-                //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
-                $.each(isPolygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
-                    if (options[name])
-                        options = $.extend({}, options[name]);
-                });
-
-                if (options.addInteractive)
-                    options.interactive = true;
-
-                options.weight = options.weight || options.width;
-                options.colorName = options.colorName || options.fillColorName;
-                options.borderColorName = options.borderColorName || options.lineColorName;
-
-                options = $.extend({}, defaultOptions, options);
-
-                options.className = options.className
-                                    + (options.transparent     ? ' lpl-transparent' : '')
-                                    + (options.colorName       ? ' lpl-'+options.colorName : '')
-                                    + (options.borderColorName ? ' lpl-border-'+options.borderColorName : '');
+                options.interactive = true;
+                options.className = 'lpl-base';
 
                 initialize.call(this, latLngs, options );
 
-                this.polylineList = [];
+                this.currentOptions = {};
 
-                function extendOptions( width, className, interactive ){
-                    var result = $.extend({}, defaultOptions);
-                    return $.extend(result, {
-                        weight        : options.weight + 2*width,
-                        className     : className,
-                        addInteractive: false,
-                        border        : false,
-                        transparent   : false,
-                        hover         : false,
-                        shadow        : false,
-                        //fill          : false,
-                        shadowWhenPopupOpen     : false,
-                        tooltipHideWhenPopupOpen: false,
-                        interactive   : interactive,
-                    });
-                }
+                //polylineList contains the up to four differnet polyline/polygon used to create the border, shadow and interactive zones
+                this.polylineList = [null, null, null, null];
 
-                var thisConstructor = isPolygon  ? L.polygon : L.polyline,
-                    polyline;
+                var thisConstructor = this instanceof L.Polygon ? L.polygon : L.polyline;
 
-                if (this.options.border){
-                     this.borderAndShadowLayerGroup = L.featureGroup();
+                this.polylineList[borderIndex]      = thisConstructor( latLngs, getOptions('lpl-border',      false) );
+                this.polylineList[shadowIndex]      = thisConstructor( latLngs, getOptions('lpl-shadow',      false) );
+                this.polylineList[thisIndex]        = this;
+                this.polylineList[interactiveIndex] = thisConstructor( latLngs, getOptions('lpl-interactive', true ) );
+                this.interactivePolyline = this.polylineList[interactiveIndex]; //Easy access
 
-                    polyline = thisConstructor(this.getLatLngs(), extendOptions(this.options.borderWidth, 'lpl-border', false) );
-                     this.borderAndShadowLayerGroup.addLayer(  polyline );
-                     this.polylineList.push( polyline );
-                }
+                this.interactivePolyline._parentPolyline = this;
 
-                if (this.options.shadow || this.options.hover || this.options.shadowWhenPopupOpen){
-                    this.borderAndShadowLayerGroup = this.borderAndShadowLayerGroup || L.featureGroup();
-                    this.shadowPolyline =
-                        thisConstructor(
-                            this.getLatLngs(),
-                            extendOptions(
-                                this.options.shadowWidth,
-                                'lpl-shadow' + (this.options.shadow ? ' lpl-show' : '') +
-                                    (this.options.borderColorName ? ' lpl-border-'+this.options.borderColorName : ''),
-                                false
-                            )
-                        );
-                     this.borderAndShadowLayerGroup.addLayer(  this.shadowPolyline );
-                    this.polylineList.push( this.shadowPolyline );
-                }
 
-                if (this.options.addInteractive){
-                    this.interactiveLayerGroup = L.featureGroup();
-                    this.interactivePolyline =
-                        thisConstructor(
-                            this.getLatLngs(),
-                            extendOptions(this.options.interactiveWidth, 'lpl-interactive' + (this.options.fill || this.options.colorName ? ' lpl-fill' : ''), true)
-                         );
-                      this.interactiveLayerGroup.addLayer(  this.interactivePolyline );
+                this.on( 'remove', this.setInteractiveOff, this );
+                if (options.interactive)
+                    this.on( 'add', this.setInteractiveOn, this );
+                else
+                    this.on( 'add', this.setInteractiveOff, this );
 
-                    this.on( 'remove', this.setInteractiveOff, this );
-                    if (options.interactive)
-                        this.on( 'add', this.setInteractiveOn, this );
-                    else
-                        this.on( 'add', this.setInteractiveOff, this );
+                this.on( 'add', this.setStyle, this );
 
-                    this.interactiveLayerGroup
-                        .on( 'mouseover',  this._mouseover,  this )
-                        .on( 'mouseout',   this._mouseout,   this )
-                        .on( 'popupopen',  this._popupopen,  this )
-                        .on( 'popupclose', this._popupclose, this );
-                }
-
-                if (options.colorName)
-                    this.setColor(options.colorName);
+                this.interactivePolyline
+                        .on( 'mouseover',    this._mouseover,    this )
+                        .on( 'mouseout',     this._mouseout,     this )
+                        .on( 'popupopen',    this._popupopen,    this )
+                        .on( 'popupclose',   this._popupclose,   this );
 
 
                 return this;
             };
         }(L.Polyline.prototype.initialize),
 
+
+        /*****************************************************
+        setStyle
+        *****************************************************/
+        setStyle: function(setStyle){
+            return function( style ){
+                if (!this.options.addInteractive)
+                    return setStyle.call(this, style );
+
+                $.extend( this.options, style || {});
+
+                var options = this.currentOptions = this._getPolyOptions(),
+                    saveAddInteractive = this.options.addInteractive;
+                this.options.addInteractive = false;
+
+                options.weight = options.width || options.weight;
+                options.colorName = options.colorName || options.fillColorName;
+                options.borderColorName = options.borderColorName || options.lineColorName;
+
+                ///Set line-width of the differnet polyline
+                this.polylineList[thisIndex].setStyle(       {weight: options.weight });
+                this.polylineList[borderIndex].setStyle(     {weight: options.weight + 2*options.borderWidth     });
+                this.polylineList[shadowIndex].setStyle(     {weight: options.weight + 2*options.shadowWidth     });
+                this.polylineList[interactiveIndex].setStyle({weight: options.weight + 2*options.interactiveWidth});
+
+                //Add class and colors to this and shadow
+                this._addClass(thisIndex, options.className);
+                this.setColor(options.colorName);
+                this.setBorderColor(options.borderColorName);
+                this._toggleClass(thisIndex, 'lpl-transparent', !!options.transparent);
+
+                //Show or hide border
+                this._toggleClass(borderIndex, 'lpl-show', !!options.border);
+
+                //Show or hide shadow
+                this._toggleClass(shadowIndex, 'lpl-show', !!options.shadow);
+
+                //Only show on hover
+                this._toggleClass(null, 'lpl-only-show-on-hover', !!options.onlyShowOnHover);
+
+                this.options.addInteractive = saveAddInteractive;
+                return this;
+            };
+        }(L.Polyline.prototype.setStyle),
 
         /*****************************************************
         onAdd - Add Polyline, shadow- and inertactive LayerGroup
@@ -181,7 +203,7 @@
                 //Force sticky:true if not given
                 if (options.sticky === undefined)
                     options.sticky = true;
-                bindTooltip.call(this.interactiveLayerGroup || this, content, options);
+                bindTooltip.call(this.interactivePolyline || this, content, options);
             };
         }(L.Polyline.prototype.bindTooltip),
 
@@ -190,77 +212,125 @@
         *****************************************************/
         bindPopup: function(bindPopup){
             return function(){
-                bindPopup.apply(this.interactiveLayerGroup || this, arguments);
+                bindPopup.apply(this.interactivePolyline || this, arguments);
             };
         }(L.Polyline.prototype.bindPopup),
+
+
+        /*****************************************************
+        Open popup inside polygon or on polyline
+        *****************************************************/
+        openPopup: function(openPopup){
+            return function(layer, latlng){
+                var _this = this._parentPolyline || this;
+
+                //If not inside a filled polygon => adjust latlng to be on the line
+                if (latlng && (!(_this instanceof L.Polygon) ||  !_this.currentColorName) )
+                    latlng = L.GeometryUtil.closest(_this._map, _this, latlng);
+
+                openPopup.call(this, layer, latlng);
+            };
+        }(L.Polyline.prototype.openPopup),
+
 
         /*****************************************************
         setColor( colorName )
         *****************************************************/
         setColor: function( colorName ){
-            if (this.options.colorName)
-                this._removeClass(this, 'lpl-'+this.options.colorName);
 
-            this._addClass(this, 'lpl-'+colorName);
-            if (this.shadowPolyline)
-                this.shadowPolyline.setColor(colorName);
+            if (this.currentColorName)
+                this._removeClass(this, 'lpl-'+this.currentColorName);
+            if (colorName)
+                this._addClass(this, 'lpl-'+colorName);
 
-            this.options.colorName = colorName;
+            if (this.interactivePolyline)
+                this._toggleClass(this.interactivePolyline, 'lpl-fill', !!colorName);
+
+            this.currentColorName = colorName;
+        },
+
+        /*****************************************************
+        setBorderColor( borderColorName )
+        *****************************************************/
+        setBorderColor: function( borderColorName ){
+            if (this.currentBorderColorName)
+                this._removeClass(this, 'lpl-border-'+this.currentBorderColorName);
+            if (borderColorName){
+                this._addClass(this, 'lpl-border-'+borderColorName);
+                if (this.polylineList && this.polylineList[shadowIndex])
+                    this.polylineList[shadowIndex].setBorderColor(borderColorName);
+            }
+            this.currentBorderColorName = borderColorName;
         },
 
 
 
         /*****************************************************
-        _addClass and _removeClass: Add and remove class from a polyline
+        _addClass, _removeClass, _toggleClass:
+        Add, remove and toggle class from a polyline
         *****************************************************/
-        _addClass: function( polyline, className, remove){
+        _eachPolyline: function( onlyPolyline, methodName, arg ){
             var _this = this;
-            if (polyline)
-                $(polyline._path)[remove ? 'removeClass' : 'addClass'](className);
-            else {
-                this._addClass( this, className, remove);
-                $.each(this.polylineList, function( index, polyline ){
-                   _this._addClass( polyline, className, remove);
-                });
+            if (onlyPolyline != null){
+                if ($.isNumeric(onlyPolyline))
+                    onlyPolyline = this.polylineList[onlyPolyline];
+                if (onlyPolyline){
+                    var $path = $(onlyPolyline._path);
+                    $path[methodName].apply($path, arg);
+                }
             }
+            else
+                $.each(this.polylineList, function( index, polyline ){
+                   _this._eachPolyline( polyline, methodName, arg );
+                });
+        },
+
+        _addClass: function( polyline, className){
+            this._eachPolyline( polyline, 'addClass', [className] );
         },
 
         _removeClass: function( polyline, className){
-            this._addClass( polyline, className, true);
+            this._eachPolyline( polyline, 'removeClass', [className] );
+        },
+
+        _toggleClass: function( polyline, className, state){
+            this._eachPolyline( polyline, 'toggleClass', [className, state] );
         },
 
         /*****************************************************
-        _mouseover and _mouseup: Highlight polyline
+        _mouseover and _mouseout: Highlight polyline
         *****************************************************/
         _mouseover: function(/* mouseEvent */){
-             if (this.options.hover)
+             if (this.currentOptions.hover)
                  this._addClass(null, 'lpl-hover');
+             if (this.currentOptions.onlyShowOnHover)
+                 this._removeClass(null, 'lpl-only-show-on-hover');
         },
 
         _mouseout: function(/* mouseEvent */){
-            if (this.options.hover)
+            if (this.currentOptions.hover)
                  this._removeClass(null, 'lpl-hover');
+             if (this.currentOptions.onlyShowOnHover)
+                 this._addClass(null, 'lpl-only-show-on-hover');
         },
 
         /*****************************************************
         _popupopen and _popupclose: Highlight polyline
         *****************************************************/
         _popupopen: function(){
-            if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent && this.interactiveLayerGroup && this.interactiveLayerGroup.hideTooltip)
-                this.interactiveLayerGroup.hideTooltip();
-            if (this.options.shadowWhenPopupOpen && !this.options.shadow)
-                this._addClass(this.shadowPolyline, 'lpl-show');
-             if (this.options.transparent)
-                 this._removeClass(null, 'lpl-transparent' );
+            if (this.currentOptions.tooltipHideWhenPopupOpen && !this.currentOptions.tooltipPermanent && this.interactivePolyline && this.interactivePolyline.hideTooltip)
+                this.interactivePolyline.hideTooltip();
+            if (this.currentOptions.shadowWhenPopupOpen && !this.currentOptions.shadow)
+                this._addClass(shadowIndex, 'lpl-show');
+             this._addClass(null, 'lpl-popup-open' );
         },
 
         _popupclose: function(){
-            if (this.options.tooltipHideWhenPopupOpen && this.interactiveLayerGroup && this.interactiveLayerGroup.hideTooltip)
-                this.interactiveLayerGroup.showTooltip();
-            if (this.options.shadowWhenPopupOpen && !this.options.shadow)
-                this._removeClass(this.shadowPolyline, 'lpl-show');
-             if (this.options.transparent)
-                 this._addClass(null, 'lpl-transparent' );
+            if (this.currentOptions.tooltipHideWhenPopupOpen && this.interactivePolyline && this.interactivePolyline.hideTooltip)
+                this.interactivePolyline.showTooltip();
+            if (this.currentOptions.shadowWhenPopupOpen && !this.currentOptions.shadow)
+                this._removeClass(shadowIndex, 'lpl-show');
+             this._removeClass(null, 'lpl-popup-open' );
         },
 
         /*****************************************************
@@ -268,19 +338,21 @@
         by interactivePolyline and fired on this on clostes point
         *****************************************************/
         onMouseEventsOnInteractivePolyline: function( fn, context, mouseEvent ){
-            //If event has latLng (==MouseEvent)
+            //If event has latLng (==MouseEvent) => Adjust mouseEvent to closest latlng on this
             if (mouseEvent.latlng){
-                //Adjust mouseEvent to closest latlng on this
-                mouseEvent.latlng         = L.GeometryUtil.closest(this._map, this, mouseEvent.latlng);
-                mouseEvent.layerPoint     = this._map.latLngToLayerPoint( mouseEvent.latlng );
-                mouseEvent.containerPoint = this._map.latLngToContainerPoint( mouseEvent.latlng );
+                //If not inside a filled polygon => adjust latlng to be on the line
+                if (!(this instanceof L.Polygon) ||  !this.currentColorName){
+                    mouseEvent.latlng         = L.GeometryUtil.closest(this._map, this, mouseEvent.latlng);
+                    mouseEvent.layerPoint     = this._map.latLngToLayerPoint( mouseEvent.latlng );
+                    mouseEvent.containerPoint = this._map.latLngToContainerPoint( mouseEvent.latlng );
+                }
             }
             fn.call(context || this, mouseEvent );
         },
 
         _on: function( _on ){
             return function(type, fn, context){
-                if (!!this.interactivePolyline &&
+                if (this.interactivePolyline &&
                     ([
                         'click', 'dblclick',
                         'mousedown', 'mouseup', 'mouseover', 'mouseout', 'mousemove',
@@ -289,6 +361,7 @@
                         'tooltipopen', 'tooltipclose'
                     ].indexOf(type) != -1)
                    ){
+
                     //Create a function to re-direct the event from this.interactivePolyline to this with latLng corrected to closest to this
                     return _on.call(
                         this.interactivePolyline,
@@ -315,21 +388,21 @@
         setInteractiveOff    - set the polyline interactive off
         *****************************************************/
         setInteractive: function( on ){
-            if (!this.interactivePolyline) return;
+            if (!this.options.addInteractive) return this;
+
             if (on === undefined)
                 on = !this.isInteractive;
 
             this.isInteractive = !!on;
-             if (on)
-                 this._map.addLayer(this.interactiveLayerGroup);
-             else
-                 this._map.removeLayer(this.interactiveLayerGroup);
+              if (on)
+                  this._map.addLayer(this.polylineList[interactiveIndex]);
+              else
+                  this._map.removeLayer(this.polylineList[interactiveIndex]);
+
 
             //Toggle class "leaflet-interactive"
-            $(this._path).toggleClass( "leaflet-interactive",  this.isInteractive);
-
-             if (this.interactivePolyline)
-                 $(this.interactivePolyline._path).toggleClass( "leaflet-interactive",  this.isInteractive);
+            this._toggleClass( thisIndex, "leaflet-interactive",  this.isInteractive);
+            this._toggleClass( interactiveIndex, "leaflet-interactive",  this.isInteractive);
 
             this.onSetInteractive( this.isInteractive );
             return this;
@@ -339,7 +412,7 @@
         setInteractiveOff: function(){ return this.setInteractive( false ); },
 
         /*****************************************************
-        setLatLngs - also called for shadowPolyline and interactivePolyline
+        setLatLngs - also called for shadow-polyline and interactive-polyline
         *****************************************************/
         setLatLngs: function( setLatLngs ){
             return function(){
@@ -352,7 +425,7 @@
 
         /*****************************************************
         bringToFront, bringToBack, removeFrom:
-        All called for borderAndShadowLayerGroup and interactiveLayerGroup
+        All called for borderAndShadowLayerGroup and interactivePolyline
         *****************************************************/
         bringToFront: beforeAndAfter('bringToFront'),
         bringToBack : beforeAndAfter('bringToBack', null, true),

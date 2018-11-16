@@ -17,16 +17,21 @@ If `options.addInteractive: true` a "shadow"-line is added around the polyline a
 Default options for the shadow and interactive lines are
 
             weight         : 2,  //The width of the line
+            width          : '', //Same as weight
             colorName      : '', //Class-name to give the fill color
             fillColorName  : '', //Same as colorName
-            borderColorName: '',  //Class-name to give the border color
+            borderColorName: '',  //Class-name to give the border color. "none" will hide the border
             LineColorName  : '',  //Same as borderColorName
-            border     : false,  //True to add a semi-transparent white border to the line
-            transparent: false,  //True to make the line semi-transparent
-            hover      : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
-            shadow     : false,  //true to add big shadow to the line
+            border         : false,  //True to add a semi-transparent white border to the line
+            transparent    : false,  //True to make the line semi-transparent
+            hover          : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
+            onlyShowOnHover: false, //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
+            shadow         : false,  //true to add big shadow to the line
             shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
-            tooltipHideWhenPopupOpen: true, //false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+            tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+
+            //TODO zIndexWhenHover         : null,   //zIndex applied when the polyline/polygon is hover
+            //TODO zIndexWhenPopupOpen     : null,   //zIndex applied when the a popup is open on the polyline/polygon
 
             borderWidth     : 1, //Width of border
             shadowWidth     : 3, //Width of shadow
@@ -39,8 +44,7 @@ and in
  
 Used eq. in `L.GeoJSON` to set different options for lines and polygons
 
-**NOTE** All options *must* be set in eq. `options.polyline`
-	 
+ 
 ### Methods
 New methods are added to `L.Polyline` and `L.Polygon`
 

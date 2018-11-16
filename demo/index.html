@@ -24,6 +24,7 @@
 
 	<script src="bower_components.js"></script>
 	<script src="../src/leaflet-polyline.js"></script>
+
 	<script>
     window.bsIsTouch = false;
     window.bsIsTouch = (window.location.search =='?touch');
@@ -35,10 +36,10 @@
     }).addTo(map);
 
     var polyLine = L.polyline([[56.5, 10.5], [57,12], [55,12]], {
-
-            lineColorName: 'teal',
+width: 12,
+            lineColorName: 'red',
             border: true,
-            _shadow: true,
+            shadow: false,
             hover: true,
             transparent: true,
             shadowWhenPopupOpen: true,
@@ -48,16 +49,18 @@
 
     polyLine.bindTooltip('Tooltip');
     polyLine.bindPopup('Popup')
-polyLine.bringToFront();
 
-    var polygon = L.polygon([[56.5, 1+10.5], [57,2+12], [55,2+12]], {
+
+    var polygon = L.polygon([
+            [[54.5, 1+10.5], [57,2+12], [55,2+12]],
+            [[56.25, 12], [56.5,13.5], [55.8,14]]
+        ], {
 
             colorName: 'green',
             borderColorName: 'black',
             border: true,
-            _shadow: true,
-
-            fill: true,
+            shadow: true,
+            _fill: true,
             hover: true,
             transparent: true,
             shadowWhenPopupOpen: true,
@@ -66,89 +69,94 @@ polyLine.bringToFront();
             interactive: true,
         }).addTo(map);
 
-
-    polygon.bindTooltip('Tooltip2')
+//HER     polygon.bindTooltip('Tooltip2')
     polygon.bindPopup('Popup2')
 
+var COLOR = false;
+map.on('dblclick', function(){
+    COLOR = !COLOR;
+    polygon.setColor(COLOR ? 'blue' : '');
+});
+
+
+var marker = L.marker([50,12]).addTo(map);
+
+//HER polygon.on('mousemove', function(e){
+//HER     marker.setLatLng(e.latlng);
+//HER });
 
     //map.on('click', function(){ polyLine.setInteractive(); polygon.setInteractive(); });
 
 
     var data = {
-      "type": "FeatureCollection",
-      "features": [
-      {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [9, 52]
-      },
-      "properties": {
-        "prop0": "value0"
-      }
-    },
-
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
+        "type": "FeatureCollection",
+        "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [9, 52]
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [[10, 54], [10, 55], [12, 55],[12, 54]]
+                ]
+            }
+        }
         ]
-      },
-      "properties": {
-        "prop0": "value0",
-        "prop1": 0.0
-      }
-    },
-
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [[10, 54], [10, 55], [12, 55],[12, 54]]
-        ]
-      },
-      "properties": {
-        "prop0": "value0",
-        "prop1": { "this": "that" }
-      }
     }
-
-  ]
-}
 
     L.geoJSON(data,{
         onEachFeature: function (feature, layer) {
-            layer.bindTooltip('Tooltip geoJSON');
+//HER             layer.bindTooltip('Tooltip geoJSON');
             layer.bindPopup('popup geoJSON');
-            layer.on('mouseover', function () {
-                console.log('mouseOVER');
-            });
-            layer.on('mouseout', function () {
-                console.log('mouseOUT');
-            });
+//HER             layer.on('mouseover', function () {
+//HER                 console.log('mouseOVER');
+//HER             });
+//HER             layer.on('mouseout', function () {
+//HER                 console.log('mouseOUT');
+//HER             });
         },
 
-        polyline: {
-            borderColorName: "orange", width: 4,
-            addInteractive: true,
-            interactive: true,
-            hover: true,
-            border: true,
-            shadow:false, shadowWidth: 4,
-            transparent: true,
+        style: function(feature){
+            return {
+                polyline: {
+                    lineColorName: "orange",
+                    interactive: true,
+                    hover: true,
+                    border: true,
+                    shadow:false,
+                    transparent: false,
+                }
+            }
         },
+        lineColorName: 'red',
+        shadow: true,
+        addInteractive: true,
+        transparent: true,
         polygon: {
             colorName: 'red',
-            borderColorName: "green", width: 4,
-            addInteractive: true,
+            borderColorName: "yellow",
             interactive: true,
-            hover: true,
+            _hover: false,
             border: true,
-            _shadow:true, shadowWidth: 40,
-            transparent: true,
+            shadow:false,
+            shadowWhenPopupOpen: true,
+            onlyShowOnHover: true,
+            transparent: false,
         }
     }).addTo(map);
 
