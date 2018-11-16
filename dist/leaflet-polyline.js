@@ -69,7 +69,6 @@
 
         function getOptions( className, interactive ){
             return $.extend({}, defaultOptions, {
-                weight: 10, color: 'red',
                        className     : className,
                        addInteractive: false,
                        interactive   : interactive,
@@ -78,23 +77,6 @@
 
 
     L.Polyline.include({
-        /*****************************************************
-        _getPolyOptions
-        Returna copy of the current options to be used
-        Depends on the class og this
-        *****************************************************/
-        _getPolyOptions: function(){
-            var result = $.extend({}, this.options);
-
-            //If there are options in options.polyline or options.LineString for polyline etc. => copy them into options.
-            //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
-            $.each(this instanceof L.Polygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
-               if (result[name])
-                   $.extend(result, result[name]);
-            });
-            return $.extend({}, defaultOptions, result);
-        },
-
         /*****************************************************
         initialize
         *****************************************************/
@@ -105,6 +87,7 @@
                     return initialize.call(this, latLngs, options );
 
                 options.interactive = true;
+                options.weight = options.weight || options.width || defaultOptions.weight;
                 options.className = 'lpl-base';
 
                 initialize.call(this, latLngs, options );
@@ -155,13 +138,24 @@
 
                 $.extend( this.options, style || {});
 
-                var options = this.currentOptions = this._getPolyOptions(),
-                    saveAddInteractive = this.options.addInteractive;
+                var options = $.extend({}, defaultOptions, this.options);
+
+                //If there are options in options.polyline or options.LineString for polyline etc. => copy them into options.
+                //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
+                $.each(this instanceof L.Polygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
+                    if (options[name])
+                        $.extend(options, options[name]);
+                });
+
+                //var options = this.currentOptions = this._getPolyOptions();
+                var saveAddInteractive = this.options.addInteractive;
                 this.options.addInteractive = false;
 
                 options.weight = options.width || options.weight;
                 options.colorName = options.colorName || options.fillColorName;
                 options.borderColorName = options.borderColorName || options.lineColorName;
+
+                this.currentOptions = options;
 
                 ///Set line-width of the differnet polyline
                 this.polylineList[thisIndex].setStyle(       {weight: options.weight });

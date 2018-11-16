@@ -36,8 +36,7 @@
     }).addTo(map);
 
     var polyLine = L.polyline([[56.5, 10.5], [57,12], [55,12]], {
-width: 12,
-            lineColorName: 'red',
+            lineColorName: 'orange',
             border: true,
             shadow: false,
             hover: true,
@@ -49,7 +48,6 @@ width: 12,
 
     polyLine.bindTooltip('Tooltip');
     polyLine.bindPopup('Popup')
-
 
     var polygon = L.polygon([
             [[54.5, 1+10.5], [57,2+12], [55,2+12]],
@@ -68,6 +66,7 @@ width: 12,
             addInteractive: true,
             interactive: true,
         }).addTo(map);
+
 
 //HER     polygon.bindTooltip('Tooltip2')
     polygon.bindPopup('Popup2')
