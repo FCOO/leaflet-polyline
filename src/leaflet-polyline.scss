@@ -77,12 +77,10 @@
 
 //lpl-interactive  = The layer on top to catch events
 .lpl-interactive {
-    &.leaflet-interactive {
-        stroke: transparent;
-        fill  : none;
-        &.lpl-fill {
-            fill  : transparent;
-        }
+    stroke: transparent;
+    fill  : none;
+    &.lpl-fill {
+        fill: transparent;
     }
 }
 

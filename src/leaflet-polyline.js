@@ -86,7 +86,6 @@
                 if (!options.addInteractive)
                     return initialize.call(this, latLngs, options );
 
-                options.interactive = true;
                 options.weight = options.weight || options.width || defaultOptions.weight;
                 options.className = 'lpl-base';
 
@@ -107,14 +106,8 @@
 
                 this.interactivePolyline._parentPolyline = this;
 
-
-                this.on( 'remove', this.setInteractiveOff, this );
-                if (options.interactive)
-                    this.on( 'add', this.setInteractiveOn, this );
-                else
-                    this.on( 'add', this.setInteractiveOff, this );
-
                 this.on( 'add', this.setStyle, this );
+                this.on( 'remove', this.setInteractiveOff, this );
 
                 this.interactivePolyline
                         .on( 'mouseover',    this._mouseover,    this )
@@ -133,27 +126,31 @@
         *****************************************************/
         setStyle: function(setStyle){
             return function( style ){
+                function adjust(options){
+                    options = $.extend({}, options || {});
+                    options.weight = options.width || options.weight;
+                    options.colorName = options.colorName || options.fillColorName || options.colorName;
+                    options.borderColorName = options.borderColorName || options.lineColorName || options.borderColorName;
+                    return options;
+                }
+
                 if (!this.options.addInteractive)
                     return setStyle.call(this, style );
 
-                $.extend( this.options, style || {});
+                this.options = $.extend(true,  adjust(defaultOptions), adjust(this.options), adjust(style) );
 
-                var options = $.extend({}, defaultOptions, this.options);
+                //Create the current options in a flat object
+                var options = $.extend({},  this.options );
 
                 //If there are options in options.polyline or options.LineString for polyline etc. => copy them into options.
                 //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
                 $.each(this instanceof L.Polygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
                     if (options[name])
-                        $.extend(options, options[name]);
+                        $.extend(options, adjust(options[name]));
                 });
 
-                //var options = this.currentOptions = this._getPolyOptions();
                 var saveAddInteractive = this.options.addInteractive;
                 this.options.addInteractive = false;
-
-                options.weight = options.width || options.weight;
-                options.colorName = options.colorName || options.fillColorName;
-                options.borderColorName = options.borderColorName || options.lineColorName;
 
                 this.currentOptions = options;
 
@@ -179,6 +176,13 @@
                 this._toggleClass(null, 'lpl-only-show-on-hover', !!options.onlyShowOnHover);
 
                 this.options.addInteractive = saveAddInteractive;
+
+                this.options.interactive = options.interactive;
+
+                //Check and set active-status if polyline is added to a map
+                 if (this._map)
+                    this.setInteractive(this.options.interactive);
+
                 return this;
             };
         }(L.Polyline.prototype.setStyle),
@@ -231,14 +235,12 @@
         setColor( colorName )
         *****************************************************/
         setColor: function( colorName ){
-
             if (this.currentColorName)
                 this._removeClass(this, 'lpl-'+this.currentColorName);
             if (colorName)
                 this._addClass(this, 'lpl-'+colorName);
 
-            if (this.interactivePolyline)
-                this._toggleClass(this.interactivePolyline, 'lpl-fill', !!colorName);
+            this._toggleClass(interactiveIndex, 'lpl-fill', !!colorName);
 
             this.currentColorName = colorName;
         },
@@ -288,6 +290,7 @@
         },
 
         _toggleClass: function( polyline, className, state){
+
             this._eachPolyline( polyline, 'toggleClass', [className, state] );
         },
 
@@ -388,14 +391,9 @@
                 on = !this.isInteractive;
 
             this.isInteractive = !!on;
-              if (on)
-                  this._map.addLayer(this.polylineList[interactiveIndex]);
-              else
-                  this._map.removeLayer(this.polylineList[interactiveIndex]);
-
 
             //Toggle class "leaflet-interactive"
-            this._toggleClass( thisIndex, "leaflet-interactive",  this.isInteractive);
+            this._toggleClass( thisIndex,        "leaflet-interactive",  this.isInteractive);
             this._toggleClass( interactiveIndex, "leaflet-interactive",  this.isInteractive);
 
             this.onSetInteractive( this.isInteractive );

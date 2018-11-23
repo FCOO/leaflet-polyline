@@ -57,7 +57,8 @@
             colorName: 'green',
             borderColorName: 'black',
             border: true,
-            shadow: true,
+            _shadow: true,
+            shadowWidth: 10,
             _fill: true,
             hover: true,
             transparent: true,
@@ -68,13 +69,18 @@
         }).addTo(map);
 
 
-//HER     polygon.bindTooltip('Tooltip2')
+    polygon.bindTooltip('Tooltip2')
     polygon.bindPopup('Popup2')
 
 var COLOR = false;
-map.on('dblclick', function(){
+map.on('click', function(){
     COLOR = !COLOR;
-    polygon.setColor(COLOR ? 'blue' : '');
+//    polygon.setInteractive(COLOR);
+
+     polygon.setStyle({
+         colorName: (COLOR ? 'green' : ''),
+         interactive: !COLOR
+     });
 });
 
 
@@ -90,28 +96,28 @@ var marker = L.marker([50,12]).addTo(map);
     var data = {
         "type": "FeatureCollection",
         "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [9, 52]
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
-                ]
-            }
+         {
+             "type": "Feature",
+             "geometry": {
+                 "type": "Point",
+                 "coordinates": [9, 52]
+             }
+         },
+         {
+             "type": "Feature",
+             "geometry": {
+                 "type": "LineString",
+                 "coordinates": [
+                     [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
+                 ]
+             }
         },
         {
             "type": "Feature",
             "geometry": {
                 "type": "Polygon",
                 "coordinates": [
-                    [[10, 54], [10, 55], [12, 55],[12, 54]]
+                    [[10, 55], [10, 56], [12, 56],[12, 55]]
                 ]
             }
         }
@@ -120,43 +126,50 @@ var marker = L.marker([50,12]).addTo(map);
 
     L.geoJSON(data,{
         onEachFeature: function (feature, layer) {
-//HER             layer.bindTooltip('Tooltip geoJSON');
+            layer.bindTooltip('Tooltip geoJSON');
             layer.bindPopup('popup geoJSON');
-//HER             layer.on('mouseover', function () {
-//HER                 console.log('mouseOVER');
-//HER             });
-//HER             layer.on('mouseout', function () {
-//HER                 console.log('mouseOUT');
-//HER             });
+        },
+
+        interactive: true,
+        lineColorName: 'red',
+        colorName: 'yellow',
+        shadow: true,
+        addInteractive: true,
+        polygon: {
+            colorName: 'brown',
+            borderColorName: "black",
+            hover: true,
+            border: true,
+            shadow:true,
+            shadowWhenPopupOpen: true,
+            _onlyShowOnHover: true,
+            transparent: true,
         },
 
         style: function(feature){
             return {
+                interactive: true,
+                polygon: {
+                    borderColorName: 'green',
+                    _width: 12,
+                    _shadowWidth:30,
+                },
+
+
                 polyline: {
-                    lineColorName: "orange",
-                    interactive: true,
+                    lineColorName: "red",
+                    fill: false,
+                    width: 10,
+                    interactive: false,
                     hover: true,
                     border: true,
                     shadow:false,
-                    transparent: false,
+                    transparent: true,
+
                 }
             }
         },
-        lineColorName: 'red',
-        shadow: true,
-        addInteractive: true,
-        transparent: true,
-        polygon: {
-            colorName: 'red',
-            borderColorName: "yellow",
-            interactive: true,
-            _hover: false,
-            border: true,
-            shadow:false,
-            shadowWhenPopupOpen: true,
-            onlyShowOnHover: true,
-            transparent: false,
-        }
+
     }).addTo(map);
 
 

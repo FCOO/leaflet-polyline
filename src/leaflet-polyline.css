@@ -50,10 +50,10 @@
   .lpl-shadow.lpl-show, .lpl-shadow.lpl-hover {
     stroke-opacity: .28; }
 
-.lpl-interactive.leaflet-interactive {
+.lpl-interactive {
   stroke: transparent;
   fill: none; }
-  .lpl-interactive.leaflet-interactive.lpl-fill {
+  .lpl-interactive.lpl-fill {
     fill: transparent; }
 
 .lpl-base.lpl-pink {
