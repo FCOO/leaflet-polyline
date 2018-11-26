@@ -34,7 +34,7 @@
         maxZoom: 18,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
     }).addTo(map);
-
+/*
     var polyLine = L.polyline([[56.5, 10.5], [57,12], [55,12]], {
             lineColorName: 'orange',
             border: true,
@@ -48,12 +48,15 @@
 
     polyLine.bindTooltip('Tooltip');
     polyLine.bindPopup('Popup')
-
-    var polygon = L.polygon([
+*/
+    var latLngs = [
             [[54.5, 1+10.5], [57,2+12], [55,2+12]],
             [[56.25, 12], [56.5,13.5], [55.8,14]]
-        ], {
+        ];
 
+    var latLngs2 = [[54.5, 1+10.5], [57,2+12], [56,14]];
+
+    var polygon = L.polygon(latLngs, {
             colorName: 'green',
             borderColorName: 'black',
             border: true,
@@ -72,6 +75,9 @@
     polygon.bindTooltip('Tooltip2')
     polygon.bindPopup('Popup2')
 
+    polygon.setLatLngs(latLngs2);
+
+
 var COLOR = false;
 map.on('click', function(){
     COLOR = !COLOR;
@@ -83,7 +89,7 @@ map.on('click', function(){
      });
 });
 
-
+/*
 var marker = L.marker([50,12]).addTo(map);
 
 //HER polygon.on('mousemove', function(e){
@@ -171,7 +177,7 @@ var marker = L.marker([50,12]).addTo(map);
         },
 
     }).addTo(map);
-
+*/
 
 	</script>
 </body>

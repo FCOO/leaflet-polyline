@@ -19,7 +19,7 @@
                         firstIndex = reverseOrder ? length : 0,
                         lastIndex  = reverseOrder ? 0 : length,
                         result, i;
-                     for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ ){
+                    for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ ){
                         if (i == thisIndex)
                             result = method.apply(this, arguments);
                         else
@@ -404,21 +404,11 @@
         setInteractiveOff: function(){ return this.setInteractive( false ); },
 
         /*****************************************************
-        setLatLngs - also called for shadow-polyline and interactive-polyline
+        setLatLngs, bringToFront, bringToBack, removeFrom:
+        All called for all polylines
         *****************************************************/
-        setLatLngs: function( setLatLngs ){
-            return function(){
-                setLatLngs.apply(this, arguments);
-                $.each( this.polylineList, function( index, polyline ){
-                    setLatLngs.apply(polyline, arguments);
-                });
-            };
-        }(L.Polyline.prototype.setLatLngs ),
+        setLatLngs: beforeAndAfter('setLatLngs'),
 
-        /*****************************************************
-        bringToFront, bringToBack, removeFrom:
-        All called for borderAndShadowLayerGroup and interactivePolyline
-        *****************************************************/
         bringToFront: beforeAndAfter('bringToFront'),
         bringToBack : beforeAndAfter('bringToBack', null, true),
         removeFrom  : beforeAndAfter('removeFrom'),
