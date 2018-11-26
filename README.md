@@ -30,6 +30,8 @@ Default options for the shadow and interactive lines are
             shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
             tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
 
+            addInteractiveLayerGroup: false, //true to add this.interactiveLayerGroup to hold layers only visible when interactive is on
+
             //TODO zIndexWhenHover         : null,   //zIndex applied when the polyline/polygon is hover
             //TODO zIndexWhenPopupOpen     : null,   //zIndex applied when the a popup is open on the polyline/polygon
 

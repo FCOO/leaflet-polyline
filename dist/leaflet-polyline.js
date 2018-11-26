@@ -11,20 +11,33 @@
 ****************************************************************************/
 (function ($, L, window, document, undefined) {
     "use strict";
-    var beforeAndAfter = function(methodName, method, reverseOrder) {
+    var beforeAndAfter = function(methodName, method, reverseOrder, notForLayerGroup) {
             method = method || L.Polyline.prototype[methodName];
             return function(){
+                function applyToInteractiveLayerGroup(arg){
+                    if (this.interactiveLayerGroup && !notForLayerGroup)
+                        this.interactiveLayerGroup[methodName].apply(this.interactiveLayerGroup, arg);
+                }
+
+
                 if (this.polylineList){
                     var length = this.polylineList.length-1,
                         firstIndex = reverseOrder ? length : 0,
                         lastIndex  = reverseOrder ? 0 : length,
                         result, i;
-                    for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ ){
+
+                    if (reverseOrder)
+                        applyToInteractiveLayerGroup.call( this, arguments );
+
+                    for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ )
                         if (i == thisIndex)
                             result = method.apply(this, arguments);
                         else
                             this.polylineList[i][methodName].apply(this.polylineList[i], arguments);
-                    }
+
+                    if (!reverseOrder)
+                        applyToInteractiveLayerGroup.call( this, arguments );
+
                     return result;
                 }
                 else
@@ -50,6 +63,8 @@
             shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
             tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
 
+            addInteractiveLayerGroup: false, //true to add this.interactiveLayerGroup to hold layers only visible when interactive is on
+            onSetInteractive        : null,  //function( on ) called when interactive is set on or off
 
             //TODO zIndexWhenHover         : null,   //zIndex applied when the polyline/polygon is hover
             //TODO zIndexWhenPopupOpen     : null,   //zIndex applied when the a popup is open on the polyline/polygon
@@ -93,7 +108,7 @@
 
                 this.currentOptions = {};
 
-                //polylineList contains the up to four differnet polyline/polygon used to create the border, shadow and interactive zones
+                //polylineList contains the up to four different polyline/polygon used to create the border, shadow and interactive zones
                 this.polylineList = [null, null, null, null];
 
                 var thisConstructor = this instanceof L.Polygon ? L.polygon : L.polyline;
@@ -102,9 +117,12 @@
                 this.polylineList[shadowIndex]      = thisConstructor( latLngs, getOptions('lpl-shadow',      false) );
                 this.polylineList[thisIndex]        = this;
                 this.polylineList[interactiveIndex] = thisConstructor( latLngs, getOptions('lpl-interactive', true ) );
-                this.interactivePolyline = this.polylineList[interactiveIndex]; //Easy access
 
+                this.interactivePolyline = this.polylineList[interactiveIndex]; //Easy access
                 this.interactivePolyline._parentPolyline = this;
+
+                if (this.options.addInteractiveLayerGroup)
+                    this.interactiveLayerGroup = L.layerGroup();
 
                 this.on( 'add', this.setStyle, this );
                 this.on( 'remove', this.setInteractiveOff, this );
@@ -247,6 +265,7 @@
 
         /*****************************************************
         setBorderColor( borderColorName )
+        setLineColor( lineColorName )
         *****************************************************/
         setBorderColor: function( borderColorName ){
             if (this.currentBorderColorName)
@@ -258,7 +277,9 @@
             }
             this.currentBorderColorName = borderColorName;
         },
-
+        setLineColor: function( lineColorName ){
+            return this.setBorderColor( lineColorName );
+        },
 
 
         /*****************************************************
@@ -281,15 +302,15 @@
                 });
         },
 
-        _addClass: function( polyline, className){
+        _addClass: function( polyline, className ){
             this._eachPolyline( polyline, 'addClass', [className] );
         },
 
-        _removeClass: function( polyline, className){
+        _removeClass: function( polyline, className ){
             this._eachPolyline( polyline, 'removeClass', [className] );
         },
 
-        _toggleClass: function( polyline, className, state){
+        _toggleClass: function( polyline, className, state ){
 
             this._eachPolyline( polyline, 'toggleClass', [className, state] );
         },
@@ -394,9 +415,18 @@
 
             //Toggle class "leaflet-interactive"
             this._toggleClass( thisIndex,        "leaflet-interactive",  this.isInteractive);
-            this._toggleClass( interactiveIndex, "leaflet-interactive",  this.isInteractive);
+            this._toggleClass( interactiveIndex, "leaflet-interactive",  this.isInteractive, true);
+
+            //Add or remove interactiveLayerGroup
+            if (this.interactiveLayerGroup && this._map)
+                this._map[on ? 'addLayer' : 'removeLayer'](this.interactiveLayerGroup);
 
             this.onSetInteractive( this.isInteractive );
+
+            if (this.options.onSetInteractive)
+                $.proxy(this.options.onSetInteractive, this.options.context || this)( this.isInteractive );
+
+
             return this;
         },
 
@@ -407,11 +437,10 @@
         setLatLngs, bringToFront, bringToBack, removeFrom:
         All called for all polylines
         *****************************************************/
-        setLatLngs: beforeAndAfter('setLatLngs'),
-
-        bringToFront: beforeAndAfter('bringToFront'),
-        bringToBack : beforeAndAfter('bringToBack', null, true),
-        removeFrom  : beforeAndAfter('removeFrom'),
+        setLatLngs  : beforeAndAfter('setLatLngs'  , null, false, true),
+        bringToFront: beforeAndAfter('bringToFront'                   ),
+        bringToBack : beforeAndAfter('bringToBack' , null, true       ),
+        removeFrom  : beforeAndAfter('removeFrom'                     ),
     });
 
 }(jQuery, L, this, document));
