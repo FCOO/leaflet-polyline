@@ -27,6 +27,7 @@ Default options for the shadow and interactive lines are
             hover          : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
             onlyShowOnHover: false, //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
             shadow         : false,  //true to add big shadow to the line
+            shadowWhenInteractive   : false,  //When true a shadow is shown when the polyline is interactive
             shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
             tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
 

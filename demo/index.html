@@ -66,7 +66,7 @@
             hover: true,
             transparent: true,
             shadowWhenPopupOpen: true,
-
+            shadowWhenInteractive: true,
             addInteractive: true,
             interactive: true,
 
@@ -83,12 +83,12 @@
 var COLOR = false;
 map.on('click', function(){
     COLOR = !COLOR;
-//    polygon.setInteractive(COLOR);
+    polygon.setInteractive(!COLOR);
 
-     polygon.setStyle({
-         colorName: (COLOR ? 'green' : ''),
-         interactive: !COLOR
-     });
+    polygon.setStyle({
+        colorName: (COLOR ? 'green' : ''),
+        interactive: !COLOR
+    });
 });
 
 

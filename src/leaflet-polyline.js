@@ -60,6 +60,7 @@
             hover          : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
             onlyShowOnHover: false, //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
             shadow         : false,  //true to add big shadow to the line
+            shadowWhenInteractive   : false,  //When true a shadow is shown when the polyline is interactive
             shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
             tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
 
@@ -185,10 +186,10 @@
                 this._toggleClass(thisIndex, 'lpl-transparent', !!options.transparent);
 
                 //Show or hide border
-                this._toggleClass(borderIndex, 'lpl-show', !!options.border);
+                this.setBorder( options.border );
 
                 //Show or hide shadow
-                this._toggleClass(shadowIndex, 'lpl-show', !!options.shadow);
+                this.setShadow( options.shadow );
 
                 //Only show on hover
                 this._toggleClass(null, 'lpl-only-show-on-hover', !!options.onlyShowOnHover);
@@ -281,6 +282,21 @@
             return this.setBorderColor( lineColorName );
         },
 
+        /*****************************************************
+        setBorder( show )
+        Show or hide border
+        *****************************************************/
+        setBorder: function( show ){
+            this._toggleClass(borderIndex, 'lpl-show', !!show);
+        },
+
+        /*****************************************************
+        setBorder( show )
+        Show or hide shadow
+        *****************************************************/
+        setShadow: function( show ){
+            this._toggleClass(shadowIndex, 'lpl-show', !!show);
+        },
 
         /*****************************************************
         _addClass, _removeClass, _toggleClass:
@@ -346,7 +362,7 @@
         _popupclose: function(){
             if (this.currentOptions.tooltipHideWhenPopupOpen && this.interactivePolyline && this.interactivePolyline.hideTooltip)
                 this.interactivePolyline.showTooltip();
-            if (this.currentOptions.shadowWhenPopupOpen && !this.currentOptions.shadow)
+            if (this.currentOptions.shadowWhenPopupOpen && !this.currentOptions.shadow && !this.currentOptions.shadowWhenInteractive)
                 this._removeClass(shadowIndex, 'lpl-show');
              this._removeClass(null, 'lpl-popup-open' );
         },
@@ -407,7 +423,7 @@
         *****************************************************/
         setInteractive: function( on ){
             if (!this.options.addInteractive) return this;
-
+            var originalIsInteractive = this.isInteractive;
             if (on === undefined)
                 on = !this.isInteractive;
 
@@ -417,15 +433,19 @@
             this._toggleClass( thisIndex,        "leaflet-interactive",  this.isInteractive);
             this._toggleClass( interactiveIndex, "leaflet-interactive",  this.isInteractive, true);
 
+            if (this.options.shadowWhenInteractive)
+                this.setShadow( this.isInteractive );
+
+
             //Add or remove interactiveLayerGroup
             if (this.interactiveLayerGroup && this._map)
                 this._map[on ? 'addLayer' : 'removeLayer'](this.interactiveLayerGroup);
 
-            this.onSetInteractive( this.isInteractive );
-
-            if (this.options.onSetInteractive)
-                $.proxy(this.options.onSetInteractive, this.options.context || this)( this.isInteractive );
-
+            if (originalIsInteractive !== this.isInteractive){
+                this.onSetInteractive( this.isInteractive );
+                if (this.options.onSetInteractive)
+                    $.proxy(this.options.onSetInteractive, this.options.context || this)( this.isInteractive );
+            }
 
             return this;
         },
