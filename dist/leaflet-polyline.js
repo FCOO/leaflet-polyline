@@ -47,7 +47,6 @@
 
     var defaultOptions = {
             weight         : 2,  //The width of the line
-          //color          : '', //The color
             colorName      : '', //Class-name to give the fill color
             fillColorName  : '', //Same as colorName
             borderColorName: '',  //Class-name to give the border color. "none" will hide the border
@@ -58,11 +57,11 @@
             border         : false,  //True to add a semi-transparent white border to the line
             transparent    : false,  //True to make the line semi-transparent
             hover          : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
-            onlyShowOnHover: false, //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
-            shadow         : false,  //true to add big shadow to the line
-            shadowWhenInteractive   : false,  //When true a shadow is shown when the polyline is interactive
-            shadowWhenPopupOpen     : false,  //When true a shadow is shown when the popup for the marker is open
-            tooltipHideWhenPopupOpen: false,  //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+            onlyShowOnHover: false,  //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
+
+            shadow               : false,  //true to add big shadow to the line
+            shadowWhenInteractive: false,  //When true a shadow is shown when the polyline is interactive
+            shadowWhenPopupOpen  : false,  //When true a big-sdhadow is shown when the popup for the marker is open
 
             addInteractiveLayerGroup: false, //true to add this.interactiveLayerGroup to hold layers only visible when interactive is on
             onSetInteractive        : null,  //function( on ) called when interactive is set on or off
@@ -220,6 +219,8 @@
                 //Force sticky:true if not given
                 if (options.sticky === undefined)
                     options.sticky = true;
+                options.hideWhenDragging = this.options.tool;
+
                 bindTooltip.call(this.interactivePolyline || this, content, options);
             };
         }(L.Polyline.prototype.bindTooltip),
@@ -229,10 +230,18 @@
         *****************************************************/
         bindPopup: function(bindPopup){
             return function(){
-                bindPopup.apply(this.interactivePolyline || this, arguments);
+                return bindPopup.apply(this.interactivePolyline || this, arguments);
             };
         }(L.Polyline.prototype.bindPopup),
 
+        /*****************************************************
+        Unbind popup from interactivePolyline (if any)
+        *****************************************************/
+        unbindPopup: function(unbindPopup){
+            return function(){
+                return unbindPopup.apply(this.interactivePolyline || this, arguments);
+            };
+        }(L.Polyline.prototype.unbindPopup),
 
         /*****************************************************
         Open popup inside polygon or on polyline
@@ -248,6 +257,17 @@
                 openPopup.call(this, layer, latlng);
             };
         }(L.Polyline.prototype.openPopup),
+
+
+        /*****************************************************
+        closePopup(), togglePopup(), isPopupOpen(),
+        setPopupContent(), getPopup() from interactivePolyline (if any)
+        *****************************************************/
+        closePopup      : function(closePopup)      { return function(){ return closePopup.apply(this.interactivePolyline      || this, arguments); }; }( L.Polyline.prototype.closePopup      ),
+        togglePopup     : function(togglePopup)     { return function(){ return togglePopup.apply(this.interactivePolyline     || this, arguments); }; }( L.Polyline.prototype.togglePopup     ),
+        isPopupOpen     : function(isPopupOpen)     { return function(){ return isPopupOpen.apply(this.interactivePolyline     || this, arguments); }; }( L.Polyline.prototype.isPopupOpen     ),
+        setPopupContent : function(setPopupContent) { return function(){ return setPopupContent.apply(this.interactivePolyline || this, arguments); }; }( L.Polyline.prototype.setPopupContent ),
+        getPopup        : function(getPopup)        { return function(){ return getPopup.apply(this.interactivePolyline        || this, arguments); }; }( L.Polyline.prototype.getPopup        ),
 
 
         /*****************************************************
@@ -352,16 +372,12 @@
         _popupopen and _popupclose: Highlight polyline
         *****************************************************/
         _popupopen: function(){
-            if (this.currentOptions.tooltipHideWhenPopupOpen && !this.currentOptions.tooltipPermanent && this.interactivePolyline && this.interactivePolyline.hideTooltip)
-                this.interactivePolyline.hideTooltip();
             if (this.currentOptions.shadowWhenPopupOpen && !this.currentOptions.shadow)
                 this._addClass(shadowIndex, 'lpl-show');
              this._addClass(null, 'lpl-popup-open' );
         },
 
         _popupclose: function(){
-            if (this.currentOptions.tooltipHideWhenPopupOpen && this.interactivePolyline && this.interactivePolyline.hideTooltip)
-                this.interactivePolyline.showTooltip();
             if (this.currentOptions.shadowWhenPopupOpen && !this.currentOptions.shadow && !this.currentOptions.shadowWhenInteractive)
                 this._removeClass(shadowIndex, 'lpl-show');
              this._removeClass(null, 'lpl-popup-open' );

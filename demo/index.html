@@ -108,7 +108,7 @@ var marker = L.marker([50,12]).addTo(map);
              "type": "Feature",
              "geometry": {
                  "type": "Point",
-                 "coordinates": [9, 52]
+                 "coordinates": [9, 54]
              }
          },
          {
@@ -137,10 +137,9 @@ var marker = L.marker([50,12]).addTo(map);
             layer.bindTooltip('Tooltip geoJSON');
             layer.bindPopup('popup geoJSON');
         },
-
+draggable: true,
         interactive: true,
         lineColorName: 'red',
-        colorName: 'yellow',
         shadow: true,
         addInteractive: true,
         polygon: {

@@ -84,6 +84,10 @@
     }
 }
 
+//MANGLER: IMPORT default colorName-list from leaflet-bootstrap !!!!
+//Create standard colors
+//@each $name, $color in  $leaflet-bootstrap-colorName-list {
+
 
 //Create standard colors
 @each $name, $color in (
