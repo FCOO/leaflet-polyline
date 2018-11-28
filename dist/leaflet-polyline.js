@@ -11,39 +11,48 @@
 ****************************************************************************/
 (function ($, L, window, document, undefined) {
     "use strict";
-    var beforeAndAfter = function(methodName, method, reverseOrder, notForLayerGroup) {
-            method = method || L.Polyline.prototype[methodName];
-            return function(){
-                function applyToInteractiveLayerGroup(arg){
-                    if (this.interactiveLayerGroup && !notForLayerGroup)
-                        this.interactiveLayerGroup[methodName].apply(this.interactiveLayerGroup, arg);
-                }
+//    var beforeAndAfter = function(methodName, method, reverseOrder, notForLayerGroup) {
+    function beforeAndAfter(methodName, method, reverseOrder, notForLayerGroup) {
+        method = method || L.Polyline.prototype[methodName];
+        return function(){
+            function applyToInteractiveLayerGroup(arg){
+                if (this.interactiveLayerGroup && !notForLayerGroup)
+                    this.interactiveLayerGroup[methodName].apply(this.interactiveLayerGroup, arg);
+            }
 
+            if (this.polylineList){
+                var length = this.polylineList.length-1,
+                    firstIndex = reverseOrder ? length : 0,
+                    lastIndex  = reverseOrder ? 0 : length,
+                    result, i;
 
-                if (this.polylineList){
-                    var length = this.polylineList.length-1,
-                        firstIndex = reverseOrder ? length : 0,
-                        lastIndex  = reverseOrder ? 0 : length,
-                        result, i;
+                if (reverseOrder)
+                    applyToInteractiveLayerGroup.call( this, arguments );
 
-                    if (reverseOrder)
-                        applyToInteractiveLayerGroup.call( this, arguments );
+                 for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ )
+                    if (i == thisIndex)
+                        result = method.apply(this, arguments);
+                    else
+                        this.polylineList[i][methodName].apply(this.polylineList[i], arguments);
 
-                    for (i=firstIndex; reverseOrder ? i >= lastIndex : i <= lastIndex; reverseOrder ? i-- : i++ )
-                        if (i == thisIndex)
-                            result = method.apply(this, arguments);
-                        else
-                            this.polylineList[i][methodName].apply(this.polylineList[i], arguments);
+                if (!reverseOrder)
+                    applyToInteractiveLayerGroup.call( this, arguments );
 
-                    if (!reverseOrder)
-                        applyToInteractiveLayerGroup.call( this, arguments );
-
-                    return result;
-                }
-                else
-                    return method.apply(this, arguments);
-            };
+                return result;
+            }
+            else
+                return method.apply(this, arguments);
         };
+    };
+
+    function applyOnInteractivePolyline( methodName ){
+        return function( prototypeMethod ){
+                   return function(){
+                       return prototypeMethod.apply(this.interactivePolyline || this, arguments);
+                   };
+               }( L.Polyline.prototype[methodName] );
+    };
+
 
     var defaultOptions = {
             weight         : 2,  //The width of the line
@@ -102,7 +111,6 @@
                     return initialize.call(this, latLngs, options );
 
                 options.weight = options.weight || options.width || defaultOptions.weight;
-                options.className = 'lpl-base';
 
                 initialize.call(this, latLngs, options );
 
@@ -210,38 +218,32 @@
         *****************************************************/
         onAdd: beforeAndAfter( 'addTo', L.Polyline.prototype.onAdd ),
 
-        /*****************************************************
-        Bind tooltip to interactivePolyline (if any)
-        *****************************************************/
-        bindTooltip: function(bindTooltip){
-            return function(content, options){
-                options = options || {};
-                //Force sticky:true if not given
-                if (options.sticky === undefined)
-                    options.sticky = true;
-                options.hideWhenDragging = this.options.tool;
 
-                bindTooltip.call(this.interactivePolyline || this, content, options);
-            };
-        }(L.Polyline.prototype.bindTooltip),
 
         /*****************************************************
-        Bind popup to interactivePolyline (if any)
+        bindTooltip(), bindPopup(), unbindPopup(), closePopup(),
+        togglePopup(), isPopupOpen(), setPopupContent(),
+        getPopup() from interactivePolyline (if any)
         *****************************************************/
-        bindPopup: function(bindPopup){
-            return function(){
-                return bindPopup.apply(this.interactivePolyline || this, arguments);
-            };
-        }(L.Polyline.prototype.bindPopup),
+        bindTooltip    : applyOnInteractivePolyline( 'bindTooltip'     ),
+        bindPopup      : applyOnInteractivePolyline( 'bindPopup'       ),
+        unbindPopup    : applyOnInteractivePolyline( 'unbindPopup'     ),
+        closePopup     : applyOnInteractivePolyline( 'closePopup'      ),
+        togglePopup    : applyOnInteractivePolyline( 'togglePopup'     ),
+        isPopupOpen    : applyOnInteractivePolyline( 'isPopupOpen'     ),
+        setPopupContent: applyOnInteractivePolyline( 'setPopupContent' ),
+        getPopup       : applyOnInteractivePolyline( 'getPopup'        ),
+/*
+        bindTooltip
+        bindPopup
+        unbindPopup
+        closePopup      : function(closePopup)      { return function(){ return closePopup.apply(this.interactivePolyline      || this, arguments); }; }( L.Polyline.prototype.closePopup      ),
+        togglePopup     : function(togglePopup)     { return function(){ return togglePopup.apply(this.interactivePolyline     || this, arguments); }; }( L.Polyline.prototype.togglePopup     ),
+        isPopupOpen     : function(isPopupOpen)     { return function(){ return isPopupOpen.apply(this.interactivePolyline     || this, arguments); }; }( L.Polyline.prototype.isPopupOpen     ),
+        setPopupContent : function(setPopupContent) { return function(){ return setPopupContent.apply(this.interactivePolyline || this, arguments); }; }( L.Polyline.prototype.setPopupContent ),
+        getPopup        : function(getPopup)        { return function(){ return getPopup.apply(this.interactivePolyline        || this, arguments); }; }( L.Polyline.prototype.getPopup        ),
 
-        /*****************************************************
-        Unbind popup from interactivePolyline (if any)
-        *****************************************************/
-        unbindPopup: function(unbindPopup){
-            return function(){
-                return unbindPopup.apply(this.interactivePolyline || this, arguments);
-            };
-        }(L.Polyline.prototype.unbindPopup),
+*/
 
         /*****************************************************
         Open popup inside polygon or on polyline
@@ -257,18 +259,6 @@
                 openPopup.call(this, layer, latlng);
             };
         }(L.Polyline.prototype.openPopup),
-
-
-        /*****************************************************
-        closePopup(), togglePopup(), isPopupOpen(),
-        setPopupContent(), getPopup() from interactivePolyline (if any)
-        *****************************************************/
-        closePopup      : function(closePopup)      { return function(){ return closePopup.apply(this.interactivePolyline      || this, arguments); }; }( L.Polyline.prototype.closePopup      ),
-        togglePopup     : function(togglePopup)     { return function(){ return togglePopup.apply(this.interactivePolyline     || this, arguments); }; }( L.Polyline.prototype.togglePopup     ),
-        isPopupOpen     : function(isPopupOpen)     { return function(){ return isPopupOpen.apply(this.interactivePolyline     || this, arguments); }; }( L.Polyline.prototype.isPopupOpen     ),
-        setPopupContent : function(setPopupContent) { return function(){ return setPopupContent.apply(this.interactivePolyline || this, arguments); }; }( L.Polyline.prototype.setPopupContent ),
-        getPopup        : function(getPopup)        { return function(){ return getPopup.apply(this.interactivePolyline        || this, arguments); }; }( L.Polyline.prototype.getPopup        ),
-
 
         /*****************************************************
         setColor( colorName )
