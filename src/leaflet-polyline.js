@@ -91,21 +91,21 @@
         thisIndex        = 2,
         interactiveIndex = 3;
 
-        function getOptions( className, interactive ){
-            return $.extend({}, defaultOptions, {
-                       className     : className,
-                       addInteractive: false,
-                       interactive   : interactive,
-                   });
-        }
-
-
     L.Polyline.include({
         /*****************************************************
         initialize
         *****************************************************/
         initialize: function( initialize ){
             return function( latLngs, options ){
+                var _this = this;
+                function getOptions( className, interactive ){
+                    return $.extend({}, _this.options, defaultOptions, {
+                               className     : className,
+                               addInteractive: false,
+                               interactive   : interactive,
+                            });
+                }
+
                 options = options || {};
                 if (!options.addInteractive)
                     return initialize.call(this, latLngs, options );
