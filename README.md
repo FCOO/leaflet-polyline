@@ -53,6 +53,13 @@ New methods are added to `L.Polyline` and `L.Polygon`
         .setInteractiveOn();	//Set the polyline interactive on
         .setInteractiveOff();	//Set the polyline interactive off
 
+Internal methods called before and after the interactive is set on or off
+To be overwritten in descending classes
+
+        .beforeSetInteractive: function( on )
+        .afterSetInteractive : function( on )
+
+
 
 ## Copyright and License
 This plugin is licensed under the [MIT license](https://github.com/FCOO/leaflet-polyline/LICENSE).

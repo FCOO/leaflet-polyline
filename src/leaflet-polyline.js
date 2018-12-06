@@ -400,9 +400,13 @@
 
 
         /*****************************************************
-        onSetInteractive
+        beforeSetInteractive, afterSetInteractive alled before
+        and after the setting interactive on or off
         *****************************************************/
-        onSetInteractive: function( /*on*/){
+        beforeSetInteractive: function( /*on*/){
+        },
+
+        afterSetInteractive: function( /*on*/){
         },
 
         /*****************************************************
@@ -418,6 +422,9 @@
 
             this.isInteractive = !!on;
 
+            if (originalIsInteractive !== this.isInteractive)
+                this.beforeSetInteractive( this.isInteractive );
+
             //Toggle class "leaflet-interactive"
             this._toggleClass( thisIndex,        "leaflet-interactive",  this.isInteractive);
             this._toggleClass( interactiveIndex, "leaflet-interactive",  this.isInteractive, true);
@@ -431,7 +438,7 @@
                 this._map[on ? 'addLayer' : 'removeLayer'](this.interactiveLayerGroup);
 
             if (originalIsInteractive !== this.isInteractive){
-                this.onSetInteractive( this.isInteractive );
+                this.afterSetInteractive( this.isInteractive );
                 if (this.options.onSetInteractive)
                     $.proxy(this.options.onSetInteractive, this.options.context || this)( this.isInteractive );
             }
