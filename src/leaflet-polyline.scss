@@ -26,6 +26,8 @@
     stroke-opacity: 1;
     fill-opacity  : 1;
     fill          : none;
+    outline       : none;
+
 
     &.lpl-popup-open {
         stroke-opacity: 1;
@@ -59,6 +61,7 @@
     stroke        : white;
     stroke-opacity: 0;
     fill          : none;
+    outline       : none;
     &.lpl-show:not(.lpl-only-show-on-hover),
     &.lpl-show.lpl-popup-open{
         stroke-opacity: .5;
@@ -71,6 +74,7 @@
     stroke        : white;
     stroke-opacity: 0;
     fill          : none;
+    outline       : none;
     &.lpl-show, &.lpl-hover {
         stroke-opacity: .28; //.28 = estimate to look like google maps
     }
@@ -79,8 +83,9 @@
 
 //lpl-interactive  = The layer on top to catch events
 .lpl-interactive {
-    stroke: transparent;
-    fill  : none;
+    stroke : transparent;
+    fill   : none;
+    outline: none;
     &.lpl-fill {
         fill: transparent;
     }

@@ -19,130 +19,172 @@
 .lpl-base {
   stroke-opacity: 1;
   fill-opacity: 1;
-  fill: none; }
-  .lpl-base.lpl-popup-open {
-    stroke-opacity: 1;
-    fill-opacity: 1; }
-    .lpl-base.lpl-popup-open.lpl-transparent {
-      stroke-opacity: .9;
-      fill-opacity: .8; }
-  .lpl-base:not(.lpl-popup-open).lpl-only-show-on-hover {
-    stroke-opacity: 0;
-    fill-opacity: 0; }
-  .lpl-base:not(.lpl-popup-open).lpl-transparent:not(.lpl-only-show-on-hover) {
-    stroke-opacity: .7;
-    fill-opacity: .35; }
-    .lpl-base:not(.lpl-popup-open).lpl-transparent:not(.lpl-only-show-on-hover).lpl-hover {
-      stroke-opacity: .9;
-      fill-opacity: .7; }
+  fill: none;
+  outline: none;
+}
+.lpl-base.lpl-popup-open {
+  stroke-opacity: 1;
+  fill-opacity: 1;
+}
+.lpl-base.lpl-popup-open.lpl-transparent {
+  stroke-opacity: 0.9;
+  fill-opacity: 0.8;
+}
+.lpl-base:not(.lpl-popup-open).lpl-only-show-on-hover {
+  stroke-opacity: 0;
+  fill-opacity: 0;
+}
+.lpl-base:not(.lpl-popup-open).lpl-transparent:not(.lpl-only-show-on-hover) {
+  stroke-opacity: 0.7;
+  fill-opacity: 0.35;
+}
+.lpl-base:not(.lpl-popup-open).lpl-transparent:not(.lpl-only-show-on-hover).lpl-hover {
+  stroke-opacity: 0.9;
+  fill-opacity: 0.7;
+}
 
 .lpl-border {
   stroke: white;
   stroke-opacity: 0;
-  fill: none; }
-  .lpl-border.lpl-show:not(.lpl-only-show-on-hover), .lpl-border.lpl-show.lpl-popup-open {
-    stroke-opacity: .5; }
+  fill: none;
+  outline: none;
+}
+.lpl-border.lpl-show:not(.lpl-only-show-on-hover), .lpl-border.lpl-show.lpl-popup-open {
+  stroke-opacity: 0.5;
+}
 
 .lpl-shadow {
   stroke: white;
   stroke-opacity: 0;
-  fill: none; }
-  .lpl-shadow.lpl-show, .lpl-shadow.lpl-hover {
-    stroke-opacity: .28; }
+  fill: none;
+  outline: none;
+}
+.lpl-shadow.lpl-show, .lpl-shadow.lpl-hover {
+  stroke-opacity: 0.28;
+}
 
 .lpl-interactive {
   stroke: transparent;
-  fill: none; }
-  .lpl-interactive.lpl-fill {
-    fill: transparent; }
+  fill: none;
+  outline: none;
+}
+.lpl-interactive.lpl-fill {
+  fill: transparent;
+}
 
 .lpl-base.lpl-pink {
-  fill: pink; }
+  fill: pink;
+}
 
 .lpl-base.lpl-border-pink,
 .lpl-shadow.lpl-border-pink {
-  stroke: pink; }
+  stroke: pink;
+}
 
 .lpl-base.lpl-purple {
-  fill: purple; }
+  fill: purple;
+}
 
 .lpl-base.lpl-border-purple,
 .lpl-shadow.lpl-border-purple {
-  stroke: purple; }
+  stroke: purple;
+}
 
 .lpl-base.lpl-red {
-  fill: red; }
+  fill: red;
+}
 
 .lpl-base.lpl-border-red,
 .lpl-shadow.lpl-border-red {
-  stroke: red; }
+  stroke: red;
+}
 
 .lpl-base.lpl-orange {
-  fill: orange; }
+  fill: orange;
+}
 
 .lpl-base.lpl-border-orange,
 .lpl-shadow.lpl-border-orange {
-  stroke: orange; }
+  stroke: orange;
+}
 
 .lpl-base.lpl-yellow {
-  fill: yellow; }
+  fill: yellow;
+}
 
 .lpl-base.lpl-border-yellow,
 .lpl-shadow.lpl-border-yellow {
-  stroke: yellow; }
+  stroke: yellow;
+}
 
 .lpl-base.lpl-green {
-  fill: green; }
+  fill: green;
+}
 
 .lpl-base.lpl-border-green,
 .lpl-shadow.lpl-border-green {
-  stroke: green; }
+  stroke: green;
+}
 
 .lpl-base.lpl-cyan {
-  fill: cyan; }
+  fill: cyan;
+}
 
 .lpl-base.lpl-border-cyan,
 .lpl-shadow.lpl-border-cyan {
-  stroke: cyan; }
+  stroke: cyan;
+}
 
 .lpl-base.lpl-blue {
-  fill: blue; }
+  fill: blue;
+}
 
 .lpl-base.lpl-border-blue,
 .lpl-shadow.lpl-border-blue {
-  stroke: blue; }
+  stroke: blue;
+}
 
 .lpl-base.lpl-brown {
-  fill: brown; }
+  fill: brown;
+}
 
 .lpl-base.lpl-border-brown,
 .lpl-shadow.lpl-border-brown {
-  stroke: brown; }
+  stroke: brown;
+}
 
 .lpl-base.lpl-white {
-  fill: white; }
+  fill: white;
+}
 
 .lpl-base.lpl-border-white,
 .lpl-shadow.lpl-border-white {
-  stroke: white; }
+  stroke: white;
+}
 
 .lpl-base.lpl-grey {
-  fill: grey; }
+  fill: grey;
+}
 
 .lpl-base.lpl-border-grey,
 .lpl-shadow.lpl-border-grey {
-  stroke: grey; }
+  stroke: grey;
+}
 
 .lpl-base.lpl-black {
-  fill: black; }
+  fill: black;
+}
 
 .lpl-base.lpl-border-black,
 .lpl-shadow.lpl-border-black {
-  stroke: black; }
+  stroke: black;
+}
 
 .lpl-base.lpl-none {
-  fill: none; }
+  fill: none;
+}
 
 .lpl-base.lpl-border-none,
 .lpl-shadow.lpl-border-none {
-  stroke: none; }
+  stroke: none;
+}
