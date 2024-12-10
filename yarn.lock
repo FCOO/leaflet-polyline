@@ -4324,8 +4324,9 @@ grunt-css-url-embed@^1.6.1:
   optionalDependencies:
     mmmagic "~0.5.0"
 
-"grunt-curl@github:fcoo/grunt-curl#^2.6.0":
+grunt-curl@fcoo/grunt-curl#^2.6.0:
   version "2.6.0"
+  uid "30664557ed8c16c026832ebbb374f021d5a8f272"
   resolved "https://codeload.github.com/fcoo/grunt-curl/tar.gz/30664557ed8c16c026832ebbb374f021d5a8f272"
   dependencies:
     async "^3.1.0"
@@ -4469,8 +4470,9 @@ grunt-legacy-util@~2.0.1:
     underscore.string "~3.3.5"
     which "~2.0.2"
 
-"grunt-postcss@github:fcoo/grunt-postcss#^1.0.0":
+grunt-postcss@fcoo/grunt-postcss#^1.0.0:
   version "0.9.0"
+  uid d9e44402f76ea098602188e22409fcc1d1f89e18
   resolved "https://codeload.github.com/fcoo/grunt-postcss/tar.gz/d9e44402f76ea098602188e22409fcc1d1f89e18"
   dependencies:
     chalk "^2.1.0"
@@ -6444,9 +6446,9 @@ nan@^2.13.2:
   integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
 
 nanoid@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
-  integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
+  version "3.3.8"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.8.tgz#b1be3030bee36aaff18bacb375e5cce521684baf"
+  integrity sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==
 
 natural-compare@^1.4.0:
   version "1.4.0"
