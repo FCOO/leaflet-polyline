@@ -78,7 +78,8 @@
             //TODO zIndexWhenHover         : null,   //zIndex applied when the polyline/polygon is hover
             //TODO zIndexWhenPopupOpen     : null,   //zIndex applied when the a popup is open on the polyline/polygon
 
-            className       : 'lpl-base',
+            baseClassName   : 'lpl-base',
+            className       : '',
 
             borderWidth     : 1, //Width of border
             shadowWidth     : 3, //Width of shadow
@@ -97,14 +98,16 @@
         *****************************************************/
         initialize: function( initialize ){
             return function( latLngs, options ){
-                var _this = this;
-                function getOptions( className, interactive ){
-                    return $.extend({}, _this.options, defaultOptions, {
-                               className     : className,
-                               addInteractive: false,
-                               interactive   : interactive,
-                            });
-                }
+
+                const getOptions = function( baseClassName='', interactive ){
+                    let result = $.extend({}, this.options, defaultOptions, {
+//                            className     : className,
+                            addInteractive: false,
+                            interactive   : interactive,
+                        });
+                    result.className = baseClassName + ' ' + (this.options.className || '');
+                    return result;                
+                }.bind(this);
 
                 options = options || {};
                 if (!options.addInteractive)
@@ -170,7 +173,7 @@
 
                 //If there are options in options.polyline or options.LineString for polyline etc. => copy them into options.
                 //This makes it possible to add options in geoJSON-layer with different options for polygons and lines
-                $.each(this instanceof L.Polygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString'], function(index, name){
+                (this instanceof L.Polygon ? ['polygon', 'Polygon'] : ['polyline', 'Polyline', 'lineString', 'LineString']).forEach( name => {
                     if (options[name])
                         $.extend(options, adjust(options[name]));
                 });
@@ -187,7 +190,7 @@
                 this.polylineList[interactiveIndex].setStyle({weight: options.weight + 2*options.interactiveWidth});
 
                 //Add class and colors to this and shadow
-                this._addClass(thisIndex, options.className);
+                this._addClass(thisIndex, (options.baseClassName || '') + ' ' + (options.className || ''));
                 this.setColor(options.colorName);
                 this.setBorderColor(options.borderColorName);
                 this._toggleClass(thisIndex, 'lpl-transparent', !!options.transparent);
@@ -296,7 +299,6 @@
         Add, remove and toggle class from a polyline
         *****************************************************/
         _eachPolyline: function( onlyPolyline, methodName, arg ){
-            var _this = this;
             if (onlyPolyline != null){
                 if ($.isNumeric(onlyPolyline))
                     onlyPolyline = this.polylineList[onlyPolyline];
@@ -306,9 +308,7 @@
                 }
             }
             else
-                $.each(this.polylineList, function( index, polyline ){
-                   _this._eachPolyline( polyline, methodName, arg );
-                });
+                this.polylineList.forEach( polyline => this._eachPolyline( polyline, methodName, arg ), this);
         },
 
         _addClass: function( polyline, className ){
