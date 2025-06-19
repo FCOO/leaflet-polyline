@@ -62,11 +62,12 @@
             LineColorName  : '',  //Same as borderColorName
 
 
-            //fill       : false,  //True to add fill colored by fillColor or SOMETHING ELSE TODO
-            border         : false,  //True to add a semi-transparent white border to the line
-            transparent    : false,  //True to make the line semi-transparent
-            hover          : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
-            onlyShowOnHover: false,  //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
+          //fill            : false,  //True to add fill colored by fillColor or SOMETHING ELSE TODO
+            border          : false,  //True to add a semi-transparent white border to the line
+            transparent     : false,  //True to make the line and fill semi-transparent
+            extraTransparent: false,  //True to make the line and fill almost full -transparent
+            hover           : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
+            onlyShowOnHover : false,  //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
 
             shadow               : false,  //true to add big shadow to the line
             shadowWhenInteractive: false,  //When true a shadow is shown when the polyline is interactive
@@ -106,7 +107,7 @@
                             interactive   : interactive,
                         });
                     result.className = baseClassName + ' ' + (this.options.className || '');
-                    return result;                
+                    return result;
                 }.bind(this);
 
                 options = options || {};
@@ -193,7 +194,9 @@
                 this._addClass(thisIndex, (options.baseClassName || '') + ' ' + (options.className || ''));
                 this.setColor(options.colorName);
                 this.setBorderColor(options.borderColorName);
-                this._toggleClass(thisIndex, 'lpl-transparent', !!options.transparent);
+                this._toggleClass(thisIndex, 'lpl-any-transparent',   !!options.transparent || !!options.extraTransparent);
+                this._toggleClass(thisIndex, 'lpl-transparent',       !!options.transparent && !options.extraTransparent);
+                this._toggleClass(thisIndex, 'lpl-extra-transparent', !!options.extraTransparent);
 
                 //Show or hide border
                 this.setBorder( options.border );

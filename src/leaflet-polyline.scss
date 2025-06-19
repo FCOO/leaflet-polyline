@@ -23,33 +23,52 @@
 
 //lpl-base = The original polyline
 .lpl-base {
-    stroke-opacity: 1;
-    fill-opacity  : 1;
+    --stroke-opacity: 1;
+    --fill-opacity  : 1;
+
+    stroke-opacity: var(--stroke-opacity);
+    fill-opacity  : var(--fill-opacity);
     fill          : none;
     outline       : none;
 
 
     &.lpl-popup-open {
-        stroke-opacity: 1;
-        fill-opacity  : 1;
+        --stroke-opacity: 1;
+        --fill-opacity  : 1;
+        &.lpl-any-transparent{
+            --stroke-opacity: .9;
+        }
+
         &.lpl-transparent{
-            stroke-opacity: .9;
-            fill-opacity  : .8;
+            --fill-opacity  : .8;
+        }
+        &.lpl-extra-transparent{
+            --fill-opacity  : .4;
         }
     }
 
     &:not(.lpl-popup-open){
         &.lpl-only-show-on-hover {
-            stroke-opacity: 0;
-            fill-opacity  : 0;
+            --stroke-opacity: 0;
+            --fill-opacity  : 0;
         }
 
-        &.lpl-transparent:not(.lpl-only-show-on-hover) {
-            stroke-opacity: .7;
-            fill-opacity  : .35;
+        &.lpl-any-transparent:not(.lpl-only-show-on-hover) {
+            --stroke-opacity: .7;
             &.lpl-hover{
-                stroke-opacity: .9;
-                fill-opacity  : .7;
+                --stroke-opacity: .9;
+            }
+        }
+        &.lpl-transparent:not(.lpl-only-show-on-hover) {
+            --fill-opacity  : .35;
+            &.lpl-hover{
+                --fill-opacity  : .7;
+            }
+        }
+        &.lpl-extra-transparent:not(.lpl-only-show-on-hover) {
+            --fill-opacity  : .17;
+            &.lpl-hover{
+                --fill-opacity  : .35;
             }
         }
     }

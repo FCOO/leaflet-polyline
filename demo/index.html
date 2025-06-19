@@ -44,7 +44,7 @@
             shadowWhenPopupOpen: true,
             addInteractive: true,
             interactive: true,
-className: 'NIELS',			
+className: 'NIELS',
         }).addTo(map);
 
     polyLine.bindTooltip('Tooltip');
@@ -56,6 +56,7 @@ className: 'NIELS',
         ];
 
     var latLngs2 = [[54.5, 1+10.5], [57,2+12], [56,14]];
+    var latLngs3 = [[54.5+2, 1+2], [57,2+12 + 2], [56+2,14+2]];
 
     var polygon = L.polygon(latLngs, {
             colorName: 'green',
@@ -75,10 +76,28 @@ className: 'NIELS',
         }).addTo(map);
 
 
-    polygon.bindTooltip('Tooltip2')
-    polygon.bindPopup('Popup2')
+    polygon.bindTooltip('Polygon Tooltip')
+    polygon.bindPopup('Polygon Popup')
 
     polygon.setLatLngs(latLngs2);
+
+    var polygon2 = L.polygon(latLngs3, {
+            colorName: 'green',
+            borderColorName: 'green',
+            border: true,
+            shadow: true,
+            fill: true,
+            hover: true,
+            extraTransparent: true,
+
+            shadowWhenPopupOpen: true,
+            shadowWhenInteractive: true,
+            addInteractive: true,
+            interactive: true,
+        }).addTo(map);
+    polygon2.bindTooltip('Polygon2 Tooltip')
+    polygon2.bindPopup('Polygon2 Popup')
+
 
 
 var COLOR = true;
