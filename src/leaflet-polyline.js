@@ -156,16 +156,19 @@
         setWeight
         *****************************************************/
         setWeight: function(weight){
-            const options = this.currentOptions;
-            const currentWeight = options.weight;
+            const options = this.options;
+            const optionsWeight = options.weight;
+            const currentOptions = this.currentOptions;
+            const currentOptionsWeight = currentOptions.weight;
 
             ///Set line-width of the differnet polyline
-            this.polylineList[thisIndex].setStyle(       {weight: weight });
-            this.polylineList[borderIndex].setStyle(     {weight: weight + 2*options.borderWidth     });
-            this.polylineList[shadowIndex].setStyle(     {weight: weight + 2*options.shadowWidth     });
-            this.polylineList[interactiveIndex].setStyle({weight: weight + 2*options.interactiveWidth});
+            this.polylineList[thisIndex].setStyle(       {weight: weight },                             true );
+            this.polylineList[borderIndex].setStyle(     {weight: weight + 2*options.borderWidth     }, true  );
+            this.polylineList[shadowIndex].setStyle(     {weight: weight + 2*options.shadowWidth     }, true );
+            this.polylineList[interactiveIndex].setStyle({weight: weight + 2*options.interactiveWidth}, true );
 
-            this.currentOptions.weight = currentWeight;
+            this.options.weight = optionsWeight;
+            this.currentOptions.weight = currentOptionsWeight;
             return this;
         },
 
@@ -173,7 +176,7 @@
         setStyle
         *****************************************************/
         setStyle: function(setStyle){
-            return function( style ){
+            return function( style, isSimple ){
                 function adjust(options){
                     options = $.extend({}, options || {});
                     options.weight = options.width || options.weight;
@@ -182,7 +185,7 @@
                     return options;
                 }
 
-                if (!this.options.addInteractive)
+                if (!this.options.addInteractive || isSimple)
                     return setStyle.call(this, style );
 
                 this.options = $.extend(true,  adjust(defaultOptions), adjust(this.options), adjust(style) );
@@ -203,7 +206,7 @@
                 this.currentOptions = options;
 
                 ///Set line-width of the differnet polyline
-                this.setWeight( options.weight );
+                this.setWeight( this.mouseover && options.hoverWeight ? options.hoverWeight :  options.weight );
 
                 //Add class and colors to this and shadow
                 this._addClass(thisIndex, (options.baseClassName || '') + ' ' + (options.className || ''));
@@ -347,6 +350,7 @@
         _mouseover and _mouseout: Highlight polyline
         *****************************************************/
         _mouseover: function(/* mouseEvent */){
+            this.mouseover = true;
             if (this.currentOptions.hoverWeight)
                 this.setWeight( this.currentOptions.hoverWeight );
 
@@ -357,6 +361,7 @@
         },
 
         _mouseout: function(/* mouseEvent */){
+            this.mouseover = false;
             if (this.currentOptions.hoverWeight)
                 this.setWeight( this.currentOptions.weight );
             if (this.currentOptions.hover)
