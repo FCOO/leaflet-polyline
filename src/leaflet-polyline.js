@@ -68,6 +68,7 @@
             extraTransparent: false,  //True to make the line and fill almost full -transparent
             hover           : false,  //True to show big-shadow and 0.9 opacuity for lpl-transparent when hover
             onlyShowOnHover : false,  //When true the polyline/polygon is only visible on hover and popup-open. Need {shadow: false, hover: true}
+            hoverWeight     : null,   //The width of the line when hover. Need hover: true
 
             shadow               : false,  //true to add big shadow to the line
             shadowWhenInteractive: false,  //When true a shadow is shown when the polyline is interactive
@@ -152,6 +153,23 @@
 
 
         /*****************************************************
+        setWeight
+        *****************************************************/
+        setWeight: function(weight){
+            const options = this.currentOptions;
+            const currentWeight = options.weight;
+
+            ///Set line-width of the differnet polyline
+            this.polylineList[thisIndex].setStyle(       {weight: weight });
+            this.polylineList[borderIndex].setStyle(     {weight: weight + 2*options.borderWidth     });
+            this.polylineList[shadowIndex].setStyle(     {weight: weight + 2*options.shadowWidth     });
+            this.polylineList[interactiveIndex].setStyle({weight: weight + 2*options.interactiveWidth});
+
+            this.currentOptions.weight = currentWeight;
+            return this;
+        },
+
+        /*****************************************************
         setStyle
         *****************************************************/
         setStyle: function(setStyle){
@@ -185,10 +203,7 @@
                 this.currentOptions = options;
 
                 ///Set line-width of the differnet polyline
-                this.polylineList[thisIndex].setStyle(       {weight: options.weight });
-                this.polylineList[borderIndex].setStyle(     {weight: options.weight + 2*options.borderWidth     });
-                this.polylineList[shadowIndex].setStyle(     {weight: options.weight + 2*options.shadowWidth     });
-                this.polylineList[interactiveIndex].setStyle({weight: options.weight + 2*options.interactiveWidth});
+                this.setWeight( options.weight );
 
                 //Add class and colors to this and shadow
                 this._addClass(thisIndex, (options.baseClassName || '') + ' ' + (options.className || ''));
@@ -303,7 +318,8 @@
         *****************************************************/
         _eachPolyline: function( onlyPolyline, methodName, arg ){
             if (onlyPolyline != null){
-                if ($.isNumeric(onlyPolyline))
+//                if ($.isNumeric(onlyPolyline))
+                if (typeof onlyPolyline == 'number')
                     onlyPolyline = this.polylineList[onlyPolyline];
                 if (onlyPolyline){
                     var $path = $(onlyPolyline._path);
@@ -331,6 +347,9 @@
         _mouseover and _mouseout: Highlight polyline
         *****************************************************/
         _mouseover: function(/* mouseEvent */){
+            if (this.currentOptions.hoverWeight)
+                this.setWeight( this.currentOptions.hoverWeight );
+
              if (this.currentOptions.hover)
                  this._addClass(null, 'lpl-hover');
              if (this.currentOptions.onlyShowOnHover)
@@ -338,6 +357,8 @@
         },
 
         _mouseout: function(/* mouseEvent */){
+            if (this.currentOptions.hoverWeight)
+                this.setWeight( this.currentOptions.weight );
             if (this.currentOptions.hover)
                  this._removeClass(null, 'lpl-hover');
              if (this.currentOptions.onlyShowOnHover)
